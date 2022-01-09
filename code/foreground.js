@@ -163,9 +163,6 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 				console.error(err);
 			}
 			break;
-		case "favorites cleared":
-			
-			break;
 		case "settings changed":
 			try {
 				settings = (await chrome.storage.sync.get("settings")).settings;
@@ -261,7 +258,8 @@ async function add_favorite(channel_name) {
 	});
 	console.log(`favorited (${channel_name})`);
 	chrome.runtime.sendMessage({
-		subject: "favorites updated"
+		subject: "favorites updated",
+		content: "added"
 	});
 }
 
@@ -272,7 +270,8 @@ async function remove_favorite(channel_name) {
 	await chrome.storage.sync.remove(channel_name);
 	console.log(`unfavorited (${channel_name})`);
 	chrome.runtime.sendMessage({
-		subject: "favorites updated"
+		subject: "favorites updated",
+		content: "removed"
 	});
 }
 

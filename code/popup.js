@@ -69,7 +69,8 @@ confirm_btn.addEventListener("click", async (evt) => {
 		});
 		for (const tab of ttv_tabs) {
 			chrome.tabs.sendMessage(tab.id, {
-				subject: "favorites cleared"
+				subject: "favorites updated",
+				content: "cleared"
 			});
 		}
 	} catch (err) {

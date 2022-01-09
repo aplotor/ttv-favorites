@@ -31,7 +31,8 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 				for (const tab of ttv_tabs) {
 					if (!(tab.windowId == active_window.id && tab.active)) {
 						chrome.tabs.sendMessage(tab.id, {
-							subject: "favorites updated"
+							subject: "favorites updated",
+							content: msg.content
 						});
 					}
 				}
