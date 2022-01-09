@@ -3,7 +3,6 @@ console.log("foreground");
 let [
 	settings,
 	favorites,
-
 	favorite_channels_list,
 	followed_channels_list,
 	channel_name_wrapper,
@@ -77,27 +76,25 @@ const channel_mo = new MutationObserver((mutations) => {
 	}
 });
 
-const debounced_apply_settings_to_followed_channels_list = debounce(() => {
+const debounced_apply_settings_to_followed_channels_list = create_debounced_function(() => {
 	for (const channel of followed_channels_list.children) {
 		const channel_live = (channel.children[0].children[0].children[0].children[1].children[1].children[0].innerHTML == "Offline" ? false : true);
 		if (channel_live) {
 			const channel_name = channel.children[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML;
 			if (favorites.has(channel_name)) {
-				if (settings.stars == true) {
-					const red_dot_indicator = channel.children[0].children[0].children[0].children[1].children[1].children[0].children[0];
-					red_dot_indicator.replaceWith(star_indicator.cloneNode(true));
-				}
+				const channel_indicator = channel.children[0].children[0].children[0].children[1].children[1].children[0].children[0];
+				channel_indicator.replaceWith((settings.stars == true ? star_indicator.cloneNode(true) : red_dot_indicator.cloneNode(true)));
 
-				// TODO fix this
-				// if (settings.hide == true) {
-				// 	(!channel.classList.contains("d_none") ? channel.classList.add("d_none") : null);
-				// }
-			} else {
-				const indicator = channel.children[0].children[0].children[0].children[1].children[1].children[0].children[0];
-				if (indicator.classList.contains("star_indicator")) {
-					const star_indicator = indicator;
-					star_indicator.replaceWith(red_dot_indicator.cloneNode(true));	
+				if (settings.hide == true) {
+					(!channel.classList.contains("d_none") ? channel.classList.add("d_none") : null);
+				} else {
+					(channel.classList.contains("d_none") ? channel.classList.remove("d_none") : null);
 				}
+			} else {
+				const channel_indicator = channel.children[0].children[0].children[0].children[1].children[1].children[0].children[0];
+				channel_indicator.replaceWith(red_dot_indicator.cloneNode(true));
+
+				(channel.classList.contains("d_none") ? channel.classList.remove("d_none") : null);
 			}
 		}
 	}
@@ -153,35 +150,34 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 			}
 			break;
 		case "favorites updated":
-			const synced_storage = await chrome.storage.sync.get(null);
-			delete synced_storage.settings;
-			favorites = new Set([...Object.keys(synced_storage)]);
-
-			remove_star_btn();
-			add_star_btn().catch((err) => console.error(err));
-
-			update_channels_lists();
+			try {
+				const synced_storage = await chrome.storage.sync.get(null);
+				delete synced_storage.settings;
+				favorites = new Set([...Object.keys(synced_storage)]);
+	
+				remove_star_btn();
+				add_star_btn().catch((err) => console.error(err));
+	
+				update_channels_lists();
+			} catch (err) {
+				console.error(err);
+			}
 			break;
 		case "favorites cleared":
 			
 			break;
 		case "settings changed":
-
+			try {
+				settings = (await chrome.storage.sync.get("settings")).settings;
+				update_channels_lists();
+			} catch (err) {
+				console.error(err);
+			}
 			break;
 		default:
 			break;
 	}
 });
-
-function debounce(fn, timeout) {
-	let timer = null;
-	return () => {
-		(timer ? clearTimeout(timer) : null);
-		timer = setTimeout(() => {
-			fn.apply(this, arguments);
-		}, timeout);
-	};
-}
 
 function add_margin_to_squad_mode_btn() {
 	const squad_mode_btn = document.getElementsByClassName("Layout-sc-nxg1ff-0 metadata-layout__secondary-button-spacing")[0];
@@ -223,7 +219,11 @@ async function add_star_btn() {
 			once: true
 		});
 
-		(favorites.has(channel_name) ? await remove_favorite(channel_name) : await add_favorite(channel_name));
+		try {
+			(favorites.has(channel_name) ? await remove_favorite(channel_name) : await add_favorite(channel_name));
+		} catch (err) {
+			console.error(err);
+		}
 		
 		if (clicks_since_mouse_enter > 1) {
 			(evt.target.innerHTML == "☆" ? evt.target.innerHTML = "★" : evt.target.innerHTML = "☆");
@@ -282,9 +282,9 @@ function update_channels_lists() {
 	followed_channels_list_mo.disconnect();
 	followed_channels_list = document.getElementsByClassName("InjectLayout-sc-588ddc-0 dBaosp tw-transition-group")[1]; // need to get this per cycle bc ttv occasionally freezes the followed channels list (i.e., makes it inactive) and uses a new active one
 	followed_channels_list_mo.observe(followed_channels_list, {
-		attributes: false,
+		attributes: true,
 		childList: true,
-		subtree: false
+		subtree: true
 	});
 
 	const show_more_times_clicked = expand_followed_channels_list();
@@ -393,4 +393,14 @@ function create_element_from_html_string(html_string) {
 	dummy.innerHTML = html_string;
 	const element = dummy.children[0];
 	return element;
+}
+
+function create_debounced_function(fn, timeout) {
+	let timer = null;
+	return () => {
+		(timer ? clearTimeout(timer) : null);
+		timer = setTimeout(() => {
+			fn.apply(this, arguments);
+		}, timeout);
+	};
 }

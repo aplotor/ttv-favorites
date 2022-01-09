@@ -1,34 +1,42 @@
 console.log("background");
 
 chrome.runtime.onInstalled.addListener(async (details) => {
-	const settings_initialized = (Object.keys(await chrome.storage.sync.get("settings")).length == 0 ? false : true);
-	if (!settings_initialized) {
-		await chrome.storage.sync.set({
-			settings: {
-				stars: true,
-				hide: true
-			}
-		});
+	try {
+		const settings_initialized = (Object.keys(await chrome.storage.sync.get("settings")).length == 0 ? false : true);
+		if (!settings_initialized) {
+			await chrome.storage.sync.set({
+				settings: {
+					stars: true,
+					hide: true
+				}
+			});
+		}
+	
+		const settings = (await chrome.storage.sync.get("settings")).settings;
+		console.log(settings);
+	} catch (err) {
+		console.error(err);
 	}
-
-	const settings = (await chrome.storage.sync.get("settings")).settings;
-	console.log(settings);
 });
 
 chrome.runtime.onMessage.addListener(async (msg, sender) => {
 	console.log(msg);
 	switch (msg.subject) {
 		case "favorites updated":
-			const active_window = await chrome.windows.getLastFocused();
-			const ttv_tabs = await chrome.tabs.query({
-				url: "https://www.twitch.tv/*"
-			});
-			for (const tab of ttv_tabs) {
-				if (!(tab.windowId == active_window.id && tab.active)) {
-					chrome.tabs.sendMessage(tab.id, {
-						subject: "favorites updated"
-					});
+			try {
+				const active_window = await chrome.windows.getLastFocused();
+				const ttv_tabs = await chrome.tabs.query({
+					url: "https://www.twitch.tv/*"
+				});
+				for (const tab of ttv_tabs) {
+					if (!(tab.windowId == active_window.id && tab.active)) {
+						chrome.tabs.sendMessage(tab.id, {
+							subject: "favorites updated"
+						});
+					}
 				}
+			} catch (err) {
+				console.error(err);
 			}
 			break;
 		default:
