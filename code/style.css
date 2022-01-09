@@ -1,0 +1,53 @@
+body {
+	width: 300px;
+	height: auto;
+}
+
+h3 {
+	margin: 0;
+}
+
+label {
+	font-size: large;
+	line-height: 1;
+}
+
+#star_btn {
+	font-size: 23px;
+	line-height: 1;
+	background: #3a3a3d;
+	border-radius: 4.5px;
+	margin: 0 -35px 0 0;
+	padding: 3.5px 10.5px;
+	z-index: 999;
+}
+
+#star_btn:hover {
+	background: #464649;
+}
+
+.star_indicator {
+	margin: 0 -4px 0 0;
+}
+
+.center {
+	text-align: center;
+}
+
+.float_right {
+	float: right;
+}
+
+.spacing {
+	margin: 5px 0;
+}
+
+.clearfix::after {
+	content: "";
+	clear: both;
+	display: table;
+}
+
+.d_none {
+	display: none;
+}

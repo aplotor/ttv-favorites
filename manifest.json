@@ -1,0 +1,45 @@
+{
+	"author": "j9108c",
+	"name": "ttv-favorites",
+	"description": "whatever",
+	"homepage_url": "https://github.com/j9108c/ttv-favorites",
+	"version": "1.0",
+	"manifest_version": 3,
+	"icons": {
+		"16": "./images/icon_16.png",
+		"32": "./images/icon_32.png",
+		"48": "./images/icon_48.png",
+		"128": "./images/icon_128.png"
+	},
+	"action": {
+		"default_icon": {
+			"16": "./images/icon_16.png",
+			"24": "./images/icon_24.png",
+			"32": "./images/icon_32.png"
+		},
+		"default_title": "tooltip text",
+		"default_popup": "./code/popup.html"
+	},
+	"background": {
+		"type": "module",
+		"service_worker": "./code/background.js"
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"https://www.twitch.tv/*"
+			],
+			"js": [
+				"./code/foreground.js"
+			],
+			"css": [
+				"./code/style.css"
+			]
+		}
+	],
+	"permissions": [
+		"storage",
+		"tabs",
+		"webNavigation"
+	]
+}

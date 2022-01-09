@@ -1,0 +1,10 @@
+{
+	"author": "j9108c",
+	"name": "ttv-favorites",
+	"description": "",
+	"repository": "github:j9108c/ttv-favorites",
+	"license": "MIT",
+	"devDependencies": {
+		"@types/chrome": "0.0.174"
+	}
+}

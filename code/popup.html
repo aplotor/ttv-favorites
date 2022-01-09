@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<link rel="stylesheet" type="text/css" href="/code/style.css"/>
+	</head>
+	<body>
+		<div class="center">
+			<img src="/images/icon_48.png"/>
+			<h3>ttv-favorites</h3>
+		</div>
+		<hr/>
+		<input type="checkbox" id="stars_checkbox"/><label for="stars_checkbox"> show stars instead of red dots for favorited channels</label>
+		<br/>
+		<div class="spacing"></div>
+		<input type="checkbox" id="hide_checkbox"/><label for="hide_checkbox"> hide favorites from followed channels list</label>
+		<br/>
+		<button id="save_btn" class="float_right">save</button>
+		<div class="clearfix"></div>
+		<hr/>
+		<button id="clear_favorites_btn">clear all favorites</button><span id="cancel_confirm_btns_wrapper" class="float_right d_none"><button id="cancel_btn">cancel</button> <button id="confirm_btn">confirm</button></span>
+		<hr/>
+		<div class="center">
+			<a href="#" target="_blank"><img src="/images/chrome_web_store.png"/></a> <a href="https://github.com/j9108c/ttv-favorites" target="_blank"><img src="/images/github.png"/></a>
+		</div>
+		<script src="/code/popup.js" type="module"></script>
+	</body>
+</html>
