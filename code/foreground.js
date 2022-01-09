@@ -107,7 +107,12 @@ const followed_channels_list_mo = new MutationObserver((mutations) => {
 });
 
 window.addEventListener("keydown", (evt) => {
-	(evt.key == "Control" ? ctrl_key_down = true : null);
+	if (evt.key == "Control") {
+		ctrl_key_down = true;
+		setTimeout(() => {
+			ctrl_key_down = false;
+		}, 250);
+	}
 });
 window.addEventListener("keyup", (evt) => {
 	(evt.key == "Control" ? ctrl_key_down = false : null);
