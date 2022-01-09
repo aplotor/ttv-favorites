@@ -17,7 +17,7 @@
 			"24": "./images/icon_24.png",
 			"32": "./images/icon_32.png"
 		},
-		"default_title": "tooltip text",
+		"default_title": "ttv-favorites",
 		"default_popup": "./code/popup.html"
 	},
 	"background": {
