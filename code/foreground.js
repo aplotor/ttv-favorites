@@ -77,7 +77,7 @@ const channel_mo = new MutationObserver((mutations) => {
 	}
 });
 
-const followed_channels_list_mo = new MutationObserver((mutations) => {
+const debounced_apply_settings_to_followed_channels_list = debounce(() => {
 	for (const channel of followed_channels_list.children) {
 		const channel_live = (channel.children[0].children[0].children[0].children[1].children[1].children[0].innerHTML == "Offline" ? false : true);
 		if (channel_live) {
@@ -101,6 +101,9 @@ const followed_channels_list_mo = new MutationObserver((mutations) => {
 			}
 		}
 	}
+}, 50); // related timer 1
+const followed_channels_list_mo = new MutationObserver((mutations) => {
+	debounced_apply_settings_to_followed_channels_list();
 });
 
 window.addEventListener("keydown", (evt) => {
@@ -164,6 +167,16 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 			break;
 	}
 });
+
+function debounce(fn, timeout) {
+	let timer = null;
+	return () => {
+		(timer ? clearTimeout(timer) : null);
+		timer = setTimeout(() => {
+			fn.apply(this, arguments);
+		}, timeout);
+	};
+}
 
 function add_margin_to_squad_mode_btn() {
 	const squad_mode_btn = document.getElementsByClassName("Layout-sc-nxg1ff-0 metadata-layout__secondary-button-spacing")[0];
@@ -283,7 +296,7 @@ function update_channels_lists() {
 					configure_channel_clone(channel_clone);
 					
 					(num_replaced_channels < num_existing_channels ? favorite_channels_list.children[num_replaced_channels++].replaceWith(channel_clone) : favorite_channels_list.append(channel_clone));
-				}, 50);
+				}, 75); // related timer 2
 			}
 		}
 	}
@@ -298,7 +311,7 @@ function update_channels_lists() {
 		unexpand_followed_channels_list(show_more_times_clicked);
 
 		console.log("update_channels_lists completed");
-	}, 100);
+	}, 100); // related timer 3
 }
 function cycle_update_channels_lists() {
 	update_channels_lists();
@@ -351,16 +364,16 @@ function configure_channel_clone(channel_clone) {
 		evt.preventDefault();
 
 		if (ctrl_key_down) {
-			const stream_url = channel_clone.children[0].children[0].children[0].href;
-			window.open(stream_url, "_blank");
+			const channel_url = channel_clone.children[0].children[0].children[0].href;
+			window.open(channel_url, "_blank");
 		} else {
 			const show_more_times_clicked = expand_followed_channels_list();
 
 			for (const channel of followed_channels_list.children) {
 				const channel_name = channel.children[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML;
 				if (channel_name == channel_clone_name) {
-					const stream_anchor = channel.children[0].children[0].children[0];
-					stream_anchor.click();
+					const channel_anchor = channel.children[0].children[0].children[0];
+					channel_anchor.click();
 					break;
 				}
 			}
