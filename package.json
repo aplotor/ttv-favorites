@@ -1,7 +1,6 @@
 {
 	"author": "j9108c",
 	"name": "ttv-favorites",
-	"description": "star followed channels to add them to a \"favorite channels\" list on top of the \"followed channels\" list in the sidebar",
 	"repository": "github:j9108c/ttv-favorites",
 	"license": "AGPL3",
 	"devDependencies": {

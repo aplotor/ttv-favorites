@@ -1,8 +1,8 @@
 {
 	"author": "j9108c",
 	"name": "ttv-favorites",
-	"description": "star followed channels to add them to a \"favorite channels\" list on top of the \"followed channels\" list in the sidebar",
 	"homepage_url": "https://github.com/j9108c/ttv-favorites",
+	"description": "star followed channels to add them to a \"favorite channels\" list on top of the \"followed channels\" list in the sidebar",
 	"version": "1.0",
 	"manifest_version": 3,
 	"icons": {
