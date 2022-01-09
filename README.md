@@ -1,6 +1,6 @@
 # [ttv-favorites]()
 
-allows you to star followed channels to add them to a "favorite channels" list on top of the "followed channels" list in the sidebar
+star followed channels to add them to a "favorite channels" list on top of the "followed channels" list in the sidebar
 
 <!-- TODO put a gif here -->
 
