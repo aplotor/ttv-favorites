@@ -13,6 +13,14 @@ let [
 
 let ac = new AbortController();
 let clicks_since_mouse_enter = 0;
+let ctrl_key_down = false;
+
+const star_indicator = create_element_from_html_string(`
+	<span class="star_indicator">⭐</span>
+`);
+const red_dot_indicator = create_element_from_html_string(`
+	<div class="ScChannelStatusIndicator-sc-1cf6j56-0 YbZdY tw-channel-status-indicator" data-test-selector="0"></div>
+`);
 
 const sidebar_mo = new MutationObserver(async (mutations) => {
 	const element = document.getElementsByClassName("Layout-sc-nxg1ff-0 lgtHpz")[0];
@@ -32,7 +40,7 @@ const sidebar_mo = new MutationObserver(async (mutations) => {
 		`);
 		favorite_channels_list = document.getElementById("favorite_channels_list");
 
-		cycle_update_favorite_channels_list();
+		cycle_update_channels_lists();
 	}
 });
 
@@ -69,6 +77,39 @@ const channel_mo = new MutationObserver((mutations) => {
 	}
 });
 
+const followed_channels_list_mo = new MutationObserver((mutations) => {
+	for (const channel of followed_channels_list.children) {
+		const channel_live = (channel.children[0].children[0].children[0].children[1].children[1].children[0].innerHTML == "Offline" ? false : true);
+		if (channel_live) {
+			const channel_name = channel.children[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML;
+			if (favorites.has(channel_name)) {
+				if (settings.stars == true) {
+					const red_dot_indicator = channel.children[0].children[0].children[0].children[1].children[1].children[0].children[0];
+					red_dot_indicator.replaceWith(star_indicator.cloneNode(true));
+				}
+
+				// TODO fix this
+				// if (settings.hide == true) {
+				// 	(!channel.classList.contains("d_none") ? channel.classList.add("d_none") : null);
+				// }
+			} else {
+				const indicator = channel.children[0].children[0].children[0].children[1].children[1].children[0].children[0];
+				if (indicator.classList.contains("star_indicator")) {
+					const star_indicator = indicator;
+					star_indicator.replaceWith(red_dot_indicator.cloneNode(true));	
+				}
+			}
+		}
+	}
+});
+
+window.addEventListener("keydown", (evt) => {
+	(evt.key == "Control" ? ctrl_key_down = true : null);
+});
+window.addEventListener("keyup", (evt) => {
+	(evt.key == "Control" ? ctrl_key_down = false : null);
+});
+
 chrome.storage.sync.get(null, (items) => {
 	settings = items.settings;
 	console.log(settings);
@@ -103,7 +144,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 					break;
 			}
 			break;
-		case "update favorite channels list":
+		case "favorites updated":
 			const synced_storage = await chrome.storage.sync.get(null);
 			delete synced_storage.settings;
 			favorites = new Set([...Object.keys(synced_storage)]);
@@ -111,13 +152,13 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 			remove_star_btn();
 			add_star_btn().catch((err) => console.error(err));
 
-			update_favorite_channels_list();
+			update_channels_lists();
+			break;
+		case "favorites cleared":
+			
 			break;
 		case "settings changed":
 
-			break;
-		case "cleared favorites":
-			
 			break;
 		default:
 			break;
@@ -194,37 +235,39 @@ function remove_star_btn() {
 }
 
 async function add_favorite(channel_name) {
-	// for this tab
 	favorites.add(channel_name);
-	update_favorite_channels_list();
-
-	// for other tabs
+	update_channels_lists();
+	
 	await chrome.storage.sync.set({
 		[channel_name]: null // value doesnt matter, only need key existence
 	});
 	console.log(`favorited (${channel_name})`);
 	chrome.runtime.sendMessage({
-		subject: "update favorite channels list"
+		subject: "favorites updated"
 	});
 }
 
 async function remove_favorite(channel_name) {
-	// for this tab
 	favorites.delete(channel_name);
-	update_favorite_channels_list();
+	update_channels_lists();
 
-	// for other tabs
 	await chrome.storage.sync.remove(channel_name);
 	console.log(`unfavorited (${channel_name})`);
 	chrome.runtime.sendMessage({
-		subject: "update favorite channels list"
+		subject: "favorites updated"
 	});
 }
 
-function update_favorite_channels_list() {
-	console.log("update_favorite_channels_list started");
+function update_channels_lists() {
+	console.log("update_channels_lists started");
 	
+	followed_channels_list_mo.disconnect();
 	followed_channels_list = document.getElementsByClassName("InjectLayout-sc-588ddc-0 dBaosp tw-transition-group")[1]; // need to get this per cycle bc ttv occasionally freezes the followed channels list (i.e., makes it inactive) and uses a new active one
+	followed_channels_list_mo.observe(followed_channels_list, {
+		attributes: false,
+		childList: true,
+		subtree: false
+	});
 
 	const show_more_times_clicked = expand_followed_channels_list();
 	
@@ -235,36 +278,33 @@ function update_favorite_channels_list() {
 		if (channel_live) {
 			const channel_name = channel.children[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML;
 			if (favorites.has(channel_name)) {
-				if (settings.stars == true) {
-					const star_indicator = create_element_from_html_string(`
-						<span class="star_indicator">⭐</span>
-					`);
-					const red_dot_indicator = channel.children[0].children[0].children[0].children[1].children[1].children[0].children[0];
-					red_dot_indicator.replaceWith(star_indicator);
-				}
-				
-				const channel_clone = channel.cloneNode(true);
-				add_click_evt_to_channel_clone(channel_clone); // need this for client-side routing bc fsr even with deep clone, clicking on channel_clone by default does a full page reload
-				
-				(num_replaced_channels < num_existing_channels ? favorite_channels_list.children[num_replaced_channels++].replaceWith(channel_clone) : favorite_channels_list.append(channel_clone));
+				setTimeout(() => { // wait for followed_channels_list_mo to apply settings before cloning
+					const channel_clone = channel.cloneNode(true);
+					configure_channel_clone(channel_clone);
+					
+					(num_replaced_channels < num_existing_channels ? favorite_channels_list.children[num_replaced_channels++].replaceWith(channel_clone) : favorite_channels_list.append(channel_clone));
+				}, 50);
 			}
 		}
 	}
-	const num_leftover_channels = num_existing_channels - num_replaced_channels;
-	for (let i = 0; i < num_leftover_channels; i++) {
-		const last_element = [...favorite_channels_list.children].at(-1);
-		last_element.remove();
-	}
 
-	unexpand_followed_channels_list(show_more_times_clicked);
+	setTimeout(() => {
+		const num_leftover_channels = num_existing_channels - num_replaced_channels;
+		for (let i = 0; i < num_leftover_channels; i++) {
+			const last_element = [...favorite_channels_list.children].at(-1);
+			last_element.remove();
+		}
 
-	console.log("update_favorite_channels_list completed");
+		unexpand_followed_channels_list(show_more_times_clicked);
+
+		console.log("update_channels_lists completed");
+	}, 100);
 }
-function cycle_update_favorite_channels_list() {
-	update_favorite_channels_list();
+function cycle_update_channels_lists() {
+	update_channels_lists();
 
 	setInterval(() => {
-		update_favorite_channels_list();
+		update_channels_lists();
 	}, 60000);
 }
 
@@ -302,24 +342,31 @@ function unexpand_followed_channels_list(show_more_times_clicked) {
 	console.log(`show less clicked (${show_less_times_clicked}) time${(show_less_times_clicked == 1 ? "" : "s")}`);
 }
 
-function add_click_evt_to_channel_clone(channel_clone) {
+function configure_channel_clone(channel_clone) {
+	(channel_clone.classList.contains("d_none") ? channel_clone.classList.remove("d_none") : null);
+
 	const channel_clone_name = channel_clone.children[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML;
 
-	channel_clone.addEventListener("click", (evt) => {
+	channel_clone.addEventListener("click", (evt) => { // need this for client-side routing bc fsr even with deep clone, clicking on channel_clone by default does a full page reload
 		evt.preventDefault();
 
-		const show_more_times_clicked = expand_followed_channels_list();
+		if (ctrl_key_down) {
+			const stream_url = channel_clone.children[0].children[0].children[0].href;
+			window.open(stream_url, "_blank");
+		} else {
+			const show_more_times_clicked = expand_followed_channels_list();
 
-		for (const channel of followed_channels_list.children) {
-			const channel_name = channel.children[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML;
-			if (channel_name == channel_clone_name) {
-				const stream_anchor = channel.children[0].children[0].children[0];
-				stream_anchor.click();
-				break;
+			for (const channel of followed_channels_list.children) {
+				const channel_name = channel.children[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML;
+				if (channel_name == channel_clone_name) {
+					const stream_anchor = channel.children[0].children[0].children[0];
+					stream_anchor.click();
+					break;
+				}
 			}
+	
+			unexpand_followed_channels_list(show_more_times_clicked);
 		}
-
-		unexpand_followed_channels_list(show_more_times_clicked);
 	});
 }
 
