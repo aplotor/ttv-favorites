@@ -88,20 +88,10 @@ const debounced_apply_settings_to_followed_channels_list = create_debounced_func
 		const channel_live = (channel.children[0].children[0].children[0].children[1].children[1].children[0].innerHTML == "Offline" ? false : true);
 		if (channel_live) {
 			const channel_name = channel.children[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML;
-			const channel_indicator = channel.children[0].children[0].children[0].children[1].children[1].children[0].children[0];
-			
 			if (favorites.has(channel_name)) {
-				channel_indicator.replaceWith((settings.stars == true ? star_indicator.cloneNode(true) : red_dot_indicator.cloneNode(true)));
-
-				if (settings.hide == true) {
-					(!channel.classList.contains("d_none") ? channel.classList.add("d_none") : null);
-				} else {
-					(channel.classList.contains("d_none") ? channel.classList.remove("d_none") : null);
-				}
+				apply_settings_to_channel(channel, "followed");
 			} else {
-				channel_indicator.replaceWith(red_dot_indicator.cloneNode(true));
-
-				(channel.classList.contains("d_none") ? channel.classList.remove("d_none") : null);
+				remove_applied_settings_from_channel(channel);
 			}
 		}
 	}
@@ -309,32 +299,31 @@ function update_channels_lists() {
 	});
 
 	const show_more_times_clicked = expand_followed_channels_list();
-	setTimeout(() => { // wait for followed_channels_list_mo to apply settings
-		const num_existing_channels = favorite_channels_list.children.length;
-		let num_replaced_channels = 0;
-		for (const channel of followed_channels_list.children) {
-			const channel_live = (channel.children[0].children[0].children[0].children[1].children[1].children[0].innerHTML == "Offline" ? false : true);
-			if (channel_live) {
-				const channel_name = channel.children[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML;
-				if (favorites.has(channel_name)) {
-					const channel_clone = channel.cloneNode(true);
-					configure_channel_clone(channel_clone);
-					
-					(num_replaced_channels < num_existing_channels ? favorite_channels_list.children[num_replaced_channels++].replaceWith(channel_clone) : favorite_channels_list.append(channel_clone));
-				}
+
+	const num_existing_channels = favorite_channels_list.children.length;
+	let num_replaced_channels = 0;
+	for (const channel of followed_channels_list.children) {
+		const channel_live = (channel.children[0].children[0].children[0].children[1].children[1].children[0].innerHTML == "Offline" ? false : true);
+		if (channel_live) {
+			const channel_name = channel.children[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML;
+			if (favorites.has(channel_name)) {
+				const channel_clone = channel.cloneNode(true);
+				configure_channel_clone(channel_clone);
+				
+				(num_replaced_channels < num_existing_channels ? favorite_channels_list.children[num_replaced_channels++].replaceWith(channel_clone) : favorite_channels_list.append(channel_clone));
 			}
 		}
-	
-		const num_leftover_channels = num_existing_channels - num_replaced_channels;
-		for (let i = 0; i < num_leftover_channels; i++) {
-			const last_element = [...favorite_channels_list.children].at(-1);
-			last_element.remove();
-		}
-	
-		unexpand_followed_channels_list(show_more_times_clicked);
-	
-		console.log("update_channels_lists completed");
-	}, 2000);
+	}
+
+	const num_leftover_channels = num_existing_channels - num_replaced_channels;
+	for (let i = 0; i < num_leftover_channels; i++) {
+		const last_element = [...favorite_channels_list.children].at(-1);
+		last_element.remove();
+	}
+
+	unexpand_followed_channels_list(show_more_times_clicked);
+
+	console.log("update_channels_lists completed");
 }
 function cycle_update_channels_lists() {
 	update_channels_lists();
@@ -378,10 +367,35 @@ function unexpand_followed_channels_list(show_more_times_clicked) {
 	console.log(`show less clicked (${show_less_times_clicked}) time${(show_less_times_clicked == 1 ? "" : "s")}`);
 }
 
+function apply_settings_to_channel(channel, for_list) {
+	const channel_indicator = channel.children[0].children[0].children[0].children[1].children[1].children[0].children[0];
+	channel_indicator.replaceWith((settings.stars == true ? star_indicator.cloneNode(true) : red_dot_indicator.cloneNode(true)));
+
+	switch (for_list) {
+		case "favorite":
+			(channel.classList.contains("d_none") ? channel.classList.remove("d_none") : null); // in case followed_channels_list_mo added class d_none to channel before it was cloned
+			break;
+		case "followed":
+			if (settings.hide == true) {
+				(!channel.classList.contains("d_none") ? channel.classList.add("d_none") : null);
+			} else {
+				(channel.classList.contains("d_none") ? channel.classList.remove("d_none") : null);
+			}
+			break;
+		default:
+			break;
+	}
+}
+
+function remove_applied_settings_from_channel(channel) {
+	const channel_indicator = channel.children[0].children[0].children[0].children[1].children[1].children[0].children[0];
+	channel_indicator.replaceWith(red_dot_indicator.cloneNode(true));
+
+	(channel.classList.contains("d_none") ? channel.classList.remove("d_none") : null);
+}
+
 function configure_channel_clone(channel_clone) {
-	// TODO might need to just replace the indicator again here for clones since sometimes theyre not getting the star indicator fsr
-	
-	(channel_clone.classList.contains("d_none") ? channel_clone.classList.remove("d_none") : null);
+	apply_settings_to_channel(channel_clone, "favorite");
 
 	const channel_clone_name = channel_clone.children[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML;
 
