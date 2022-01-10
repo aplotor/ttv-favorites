@@ -334,7 +334,7 @@ function update_channels_lists() {
 		unexpand_followed_channels_list(show_more_times_clicked);
 	
 		console.log("update_channels_lists completed");
-	}, 1000);
+	}, 2000);
 }
 function cycle_update_channels_lists() {
 	update_channels_lists();
