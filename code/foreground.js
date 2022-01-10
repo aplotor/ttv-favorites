@@ -5,9 +5,10 @@ let [
 	favorites,
 	favorite_channels_list,
 	followed_channels_list,
-	channel_name_wrapper,
 	channel_name,
-	btns_section
+	btns_section,
+	last_channel_offline, // last visited channel
+	current_channel_offline // currently visiting channel
 ] = [null];
 
 let ac = new AbortController();
@@ -44,25 +45,40 @@ const sidebar_mo = new MutationObserver(async (mutations) => {
 });
 
 const channel_mo = new MutationObserver((mutations) => {
-	channel_name_wrapper = document.getElementsByClassName("CoreText-sc-cpl358-0 ScTitleText-sc-1gsen4-0 fWkOCC bMnEsX InjectLayout-sc-588ddc-0 gCPoAo tw-title")[0] || document.getElementsByClassName("CoreText-sc-cpl358-0 ScTitleText-sc-1gsen4-0 pASmB bMnEsX tw-title")[0]; // live or offline, respectively
+	let element = document.getElementsByClassName("ScMediaCardStatWrapper-sc-1ncw7wk-0 bfxdoE tw-media-card-stat")[0];
+	const channel_name_wrapper = document.getElementsByClassName("CoreText-sc-cpl358-0 ScTitleText-sc-1gsen4-0 fWkOCC bMnEsX InjectLayout-sc-588ddc-0 gCPoAo tw-title")[0] || document.getElementsByClassName("CoreText-sc-cpl358-0 ScTitleText-sc-1gsen4-0 pASmB bMnEsX tw-title")[0]; // for live or offline, respectively
+	const customize_channel_wrapper = document.getElementsByClassName("Layout-sc-nxg1ff-0 bpBpve")[0];
 	btns_section = document.getElementsByClassName("Layout-sc-nxg1ff-0 RxRoa")[0];
+
 	if (channel_name_wrapper && btns_section) {
 		channel_mo.disconnect();
 		remove_star_btn();
 		channel_name = channel_name_wrapper.innerHTML;
+		
+		last_channel_offline = current_channel_offline;
+		current_channel_offline = (element && element.innerHTML == "OFFLINE" ? true : false);
 
-		let element = document.getElementsByClassName("ScCoreButton-sc-1qn4ixc-0 ScCoreButtonSecondary-sc-1qn4ixc-2 bhFESG jyFZFI")[0];
+		element = document.getElementsByClassName("ScCoreButton-sc-1qn4ixc-0 ScCoreButtonSecondary-sc-1qn4ixc-2 bhFESG jyFZFI")[0];
 		const unfollow_btn = (element && element.dataset.aTarget == "unfollow-button" ? element : null);
 		if (unfollow_btn) {
-			console.log("unfollow_btn");
-
 			add_margin_to_squad_mode_btn();
-			add_star_btn().catch((err) => console.error(err));
+			if (last_channel_offline) {
+				setTimeout(() => { // wait for ttv to replace btns_section
+					btns_section = document.getElementsByClassName("Layout-sc-nxg1ff-0 RxRoa")[0]; // need to get this again bc ttv removes the previously retrieved one when going from offline channel to live channel
+					add_star_btn().catch((err) => console.error(err));
+				}, 2500);
+			} else {
+				add_star_btn().catch((err) => console.error(err));
+			}
 		}
 
 		element = document.getElementsByClassName("ScCoreButton-sc-1qn4ixc-0 ScCoreButtonPrimary-sc-1qn4ixc-1 bhFESG ksFrFH")[0];
 		const follow_btn = (element && element.dataset.aTarget == "follow-button" ? element : null);
-		(follow_btn ? console.log("follow_btn") : null);
+	} else if (element && customize_channel_wrapper) {
+		channel_mo.disconnect();
+
+		last_channel_offline = current_channel_offline;
+		current_channel_offline = (element.innerHTML == "OFFLINE" ? true : false);
 	}
 });
 
@@ -365,6 +381,8 @@ function unexpand_followed_channels_list(show_more_times_clicked) {
 }
 
 function configure_channel_clone(channel_clone) {
+	// TODO might need to just replace the indicator again here for clones since sometimes theyre not getting the star indicator fsr
+	
 	(channel_clone.classList.contains("d_none") ? channel_clone.classList.remove("d_none") : null);
 
 	const channel_clone_name = channel_clone.children[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML;

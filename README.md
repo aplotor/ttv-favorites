@@ -3,9 +3,13 @@
 
 star followed channels to add them to a "favorite channels" list in the sidebar
 
+<br/>
+
 ![add favorite](./images/readme_show_add_favorite.gif)
 
 ![settings](./images/readme_show_settings.gif)
+
+<br/>
 
 - note::
 	- favorites are synced to your browser account, not your Twitch account
