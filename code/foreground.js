@@ -54,25 +54,15 @@ const channel_mo = new MutationObserver((mutations) => {
 		let element = document.getElementsByClassName("ScCoreButton-sc-1qn4ixc-0 ScCoreButtonSecondary-sc-1qn4ixc-2 bhFESG jyFZFI")[0];
 		const unfollow_btn = (element && element.dataset.aTarget == "unfollow-button" ? element : null);
 		if (unfollow_btn) {
+			console.log("unfollow_btn");
+
 			add_margin_to_squad_mode_btn();
 			add_star_btn().catch((err) => console.error(err));
-
-			unfollow_btn.addEventListener("click", (evt) => {
-				remove_star_btn();
-			});
-			document.body.addEventListener("click", (evt) => {
-				(evt.target.closest('[data-a-target="unfollow-button"]') ? remove_star_btn() : null);
-			});
 		}
 
 		element = document.getElementsByClassName("ScCoreButton-sc-1qn4ixc-0 ScCoreButtonPrimary-sc-1qn4ixc-1 bhFESG ksFrFH")[0];
 		const follow_btn = (element && element.dataset.aTarget == "follow-button" ? element : null);
-		if (follow_btn) {
-			follow_btn.addEventListener("click", (evt) => {
-				add_margin_to_squad_mode_btn();
-				add_star_btn().catch((err) => console.error(err));
-			});
-		}
+		(follow_btn ? console.log("follow_btn") : null);
 	}
 });
 
@@ -81,8 +71,9 @@ const debounced_apply_settings_to_followed_channels_list = create_debounced_func
 		const channel_live = (channel.children[0].children[0].children[0].children[1].children[1].children[0].innerHTML == "Offline" ? false : true);
 		if (channel_live) {
 			const channel_name = channel.children[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML;
+			const channel_indicator = channel.children[0].children[0].children[0].children[1].children[1].children[0].children[0];
+			
 			if (favorites.has(channel_name)) {
-				const channel_indicator = channel.children[0].children[0].children[0].children[1].children[1].children[0].children[0];
 				channel_indicator.replaceWith((settings.stars == true ? star_indicator.cloneNode(true) : red_dot_indicator.cloneNode(true)));
 
 				if (settings.hide == true) {
@@ -91,7 +82,6 @@ const debounced_apply_settings_to_followed_channels_list = create_debounced_func
 					(channel.classList.contains("d_none") ? channel.classList.remove("d_none") : null);
 				}
 			} else {
-				const channel_indicator = channel.children[0].children[0].children[0].children[1].children[1].children[0].children[0];
 				channel_indicator.replaceWith(red_dot_indicator.cloneNode(true));
 
 				(channel.classList.contains("d_none") ? channel.classList.remove("d_none") : null);
@@ -101,6 +91,16 @@ const debounced_apply_settings_to_followed_channels_list = create_debounced_func
 }, 50); // related timer 1
 const followed_channels_list_mo = new MutationObserver((mutations) => {
 	debounced_apply_settings_to_followed_channels_list();
+});
+
+window.addEventListener("click", (evt) => {
+	if (evt.target.closest('[data-a-target="follow-button"]')) {
+		add_margin_to_squad_mode_btn();
+		add_star_btn().catch((err) => console.error(err));
+	} else if (evt.target.closest('[data-a-target="unfollow-button"]')) {
+		remove_star_btn();
+		remove_margin_from_squad_mode_btn();
+	}
 });
 
 window.addEventListener("keydown", (evt) => {
@@ -179,6 +179,11 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 function add_margin_to_squad_mode_btn() {
 	const squad_mode_btn = document.getElementsByClassName("Layout-sc-nxg1ff-0 metadata-layout__secondary-button-spacing")[0];
 	(squad_mode_btn ? squad_mode_btn.style.marginRight = "10px" : null);
+}
+
+function remove_margin_from_squad_mode_btn() {
+	const squad_mode_btn = document.getElementsByClassName("Layout-sc-nxg1ff-0 metadata-layout__secondary-button-spacing")[0];
+	(squad_mode_btn ? squad_mode_btn.style.marginRight = "-30px" : null); // -30px is its default
 }
 
 async function add_star_btn() {
