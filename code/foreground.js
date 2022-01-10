@@ -105,7 +105,7 @@ const debounced_apply_settings_to_followed_channels_list = create_debounced_func
 			}
 		}
 	}
-}, 50); // related timer 1
+}, 50);
 const followed_channels_list_mo = new MutationObserver((mutations) => {
 	debounced_apply_settings_to_followed_channels_list();
 });
@@ -208,7 +208,7 @@ async function add_star_btn() {
 		<button id="${(theme == "tw-root--theme-dark" ? "star_btn_dark" : "star_btn_light")}" type="button">${(favorites.has(channel_name) ? "★" : "☆")}</button>
 	`);
 
-	const star_btn = document.getElementById("star_btn");
+	const star_btn = document.getElementById((theme == "tw-root--theme-dark" ? "star_btn_dark" : "star_btn_light"));
 
 	star_btn.addEventListener("mouseenter", (evt) => {
 		(evt.target.innerHTML == "☆" ? evt.target.innerHTML = "★" : evt.target.innerHTML = "☆");
@@ -267,7 +267,7 @@ async function add_star_btn() {
 }
 
 function remove_star_btn() {
-	const star_btn = document.getElementById(`${(theme == "tw-root--theme-dark" ? "star_btn_dark" : "star_btn_light")}`);
+	const star_btn = document.getElementById((theme == "tw-root--theme-dark" ? "star_btn_dark" : "star_btn_light"));
 	(star_btn ? star_btn.remove() : null);
 }
 
@@ -309,35 +309,32 @@ function update_channels_lists() {
 	});
 
 	const show_more_times_clicked = expand_followed_channels_list();
-	
-	const num_existing_channels = favorite_channels_list.children.length;
-	let num_replaced_channels = 0;
-	for (const channel of followed_channels_list.children) {
-		const channel_live = (channel.children[0].children[0].children[0].children[1].children[1].children[0].innerHTML == "Offline" ? false : true);
-		if (channel_live) {
-			const channel_name = channel.children[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML;
-			if (favorites.has(channel_name)) {
-				setTimeout(() => { // wait for followed_channels_list_mo to apply settings before cloning
+	setTimeout(() => { // wait for followed_channels_list_mo to apply settings
+		const num_existing_channels = favorite_channels_list.children.length;
+		let num_replaced_channels = 0;
+		for (const channel of followed_channels_list.children) {
+			const channel_live = (channel.children[0].children[0].children[0].children[1].children[1].children[0].innerHTML == "Offline" ? false : true);
+			if (channel_live) {
+				const channel_name = channel.children[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML;
+				if (favorites.has(channel_name)) {
 					const channel_clone = channel.cloneNode(true);
 					configure_channel_clone(channel_clone);
 					
 					(num_replaced_channels < num_existing_channels ? favorite_channels_list.children[num_replaced_channels++].replaceWith(channel_clone) : favorite_channels_list.append(channel_clone));
-				}, 75); // related timer 2
+				}
 			}
 		}
-	}
-
-	setTimeout(() => {
+	
 		const num_leftover_channels = num_existing_channels - num_replaced_channels;
 		for (let i = 0; i < num_leftover_channels; i++) {
 			const last_element = [...favorite_channels_list.children].at(-1);
 			last_element.remove();
 		}
-
+	
 		unexpand_followed_channels_list(show_more_times_clicked);
-
+	
 		console.log("update_channels_lists completed");
-	}, 100); // related timer 3
+	}, 1000);
 }
 function cycle_update_channels_lists() {
 	update_channels_lists();
