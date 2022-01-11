@@ -330,7 +330,7 @@ function cycle_update_channels_lists() {
 
 	setInterval(() => {
 		update_channels_lists();
-	}, 60000);
+	}, 30000);
 }
 
 function expand_followed_channels_list() {
