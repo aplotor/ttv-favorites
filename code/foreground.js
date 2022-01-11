@@ -87,7 +87,7 @@ const debounced_apply_settings_to_followed_channels_list = create_debounced_func
 	for (const channel of followed_channels_list.children) {
 		const channel_live = (channel.children[0].children[0].children[0].children[1].children[1].children[0].innerHTML == "Offline" ? false : true);
 		if (channel_live) {
-			const channel_name = channel.children[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML;
+			const channel_name = channel.children[0].children[0].children[0].children[1].children[0].children[0].children[0].title.split(" ")[0];
 			if (favorites.has(channel_name)) {
 				apply_settings_to_channel(channel, "followed");
 			} else {
@@ -305,7 +305,7 @@ function update_channels_lists() {
 	for (const channel of followed_channels_list.children) {
 		const channel_live = (channel.children[0].children[0].children[0].children[1].children[1].children[0].innerHTML == "Offline" ? false : true);
 		if (channel_live) {
-			const channel_name = channel.children[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML;
+			const channel_name = channel.children[0].children[0].children[0].children[1].children[0].children[0].children[0].title.split(" ")[0];
 			if (favorites.has(channel_name)) {
 				const channel_clone = channel.cloneNode(true);
 				configure_channel_clone(channel_clone);
@@ -409,7 +409,7 @@ function configure_channel_clone(channel_clone) {
 			const show_more_times_clicked = expand_followed_channels_list();
 
 			for (const channel of followed_channels_list.children) {
-				const channel_name = channel.children[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML;
+				const channel_name = channel.children[0].children[0].children[0].children[1].children[0].children[0].children[0].title.split(" ")[0];
 				if (channel_name == channel_clone_name) {
 					const channel_anchor = channel.children[0].children[0].children[0];
 					channel_anchor.click();
