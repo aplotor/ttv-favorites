@@ -23,7 +23,7 @@ const red_dot_indicator = create_element_from_html_string(`
 	<div class="ScChannelStatusIndicator-sc-1cf6j56-0 gKxRMu tw-channel-status-indicator" data-test-selector="0"></div>
 `);
 
-const sidebar_mo = new MutationObserver(async (mutations) => {
+const sidebar_mo = new MutationObserver((mutations) => {
 	const element = document.getElementsByClassName("Layout-sc-nxg1ff-0 haLUXJ")[0];
 	const sidebar = (element && element.children[0] && element.children[0].getAttribute("aria-label") == "Followed Channels" ? element : null);
 	if (sidebar) {
@@ -278,7 +278,7 @@ async function add_favorite(channel_name) {
 	chrome.runtime.sendMessage({
 		subject: "favorites updated",
 		content: "added"
-	});
+	}).catch((err) => null);
 }
 
 async function remove_favorite(channel_name) {
@@ -290,7 +290,7 @@ async function remove_favorite(channel_name) {
 	chrome.runtime.sendMessage({
 		subject: "favorites updated",
 		content: "removed"
-	});
+	}).catch((err) => null);
 }
 
 function update_channels_lists() {
@@ -435,7 +435,7 @@ function create_element_from_html_string(html_string) {
 	return element;
 }
 
-function create_debounced_function(fn, timeout) {
+function create_debounced_function(fn, timeout) { // run after last invocation wrt timeout
 	let timer = null;
 	return () => {
 		(timer ? clearTimeout(timer) : null);
