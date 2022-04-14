@@ -5,9 +5,7 @@ star followed channels to add them to a "favorite channels" list in the sidebar
 
 <br/>
 
-![add favorite](./images/readme_show_add_favorite.gif)
-
-![settings](./images/readme_show_settings.gif)
+![demo](./images/demo.gif)
 
 <br/>
 
