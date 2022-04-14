@@ -14,7 +14,7 @@ let [
 let ac = new AbortController();
 let clicks_since_mouse_enter = 0;
 let ctrl_key_down = false;
-const theme = document.getElementsByTagName("html")[0].classList[2];
+const theme = document.getElementsByTagName("html")[0].classList[2].split("tw-root--theme-")[1]; // "dark"/"light"
 
 const star_indicator = create_element_from_html_string(`
 	<span class="star_indicator">⭐</span>
@@ -201,10 +201,10 @@ function remove_margin_from_squad_mode_btn() {
 
 async function add_star_btn() {
 	btns_section.insertAdjacentHTML("afterbegin", `
-		<button id="${(theme == "tw-root--theme-dark" ? "star_btn_dark" : "star_btn_light")}" type="button">${(favorites.has(channel_name) ? "★" : "☆")}</button>
+		<button id="star_btn" class="${"btn_"+theme}" type="button">${(favorites.has(channel_name) ? "★" : "☆")}</button>
 	`);
 
-	const star_btn = document.getElementById((theme == "tw-root--theme-dark" ? "star_btn_dark" : "star_btn_light"));
+	const star_btn = document.getElementById("star_btn");
 
 	star_btn.addEventListener("mouseenter", (evt) => {
 		(evt.target.innerHTML == "☆" ? evt.target.innerHTML = "★" : evt.target.innerHTML = "☆");
@@ -263,7 +263,7 @@ async function add_star_btn() {
 }
 
 function remove_star_btn() {
-	const star_btn = document.getElementById((theme == "tw-root--theme-dark" ? "star_btn_dark" : "star_btn_light"));
+	const star_btn = document.getElementById("star_btn");
 	(star_btn ? star_btn.remove() : null);
 }
 
