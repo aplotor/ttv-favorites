@@ -11,7 +11,7 @@ if (root && !root.children[0].classList.contains("eoQePv")) {
 		content: "disabled"
 	}).catch((err) => null);
 	
-	throw new Error("css class names not up to date");
+	throw new Error("css class names outdated");
 }
 
 let [
@@ -107,11 +107,7 @@ const debounced_apply_settings_to_followed_channels_list = create_debounced_func
 		const channel_live = (channel.children[0].children[0].children[0].children[1].children[1].children[0].innerHTML == "Offline" ? false : true);
 		if (channel_live) {
 			const channel_name = channel.children[0].children[0].children[0].children[1].children[0].children[0].children[0].title.split(" ")[0];
-			if (favorites.has(channel_name)) {
-				apply_settings_to_channel(channel, "followed");
-			} else {
-				remove_applied_settings_from_channel(channel);
-			}
+			(favorites.has(channel_name) ? apply_settings_to_channel(channel, "followed") : remove_applied_settings_from_channel(channel));
 		}
 	}
 }, 50);
@@ -448,7 +444,7 @@ function create_element_from_html_string(html_string) {
 	return element;
 }
 
-function create_debounced_function(fn, timeout) { // run after last invocation wrt timeout
+function create_debounced_function(fn, timeout) {
 	let timer = null;
 	return () => {
 		(timer ? clearTimeout(timer) : null);
