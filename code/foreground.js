@@ -23,7 +23,7 @@ let [
 	btns_section,
 	last_channel_offline, // last visited channel
 	current_channel_offline // currently visiting channel
-] = [null];
+] = [];
 
 let ac = new AbortController();
 let clicks_since_mouse_enter = 0;
