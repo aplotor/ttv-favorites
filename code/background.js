@@ -1,16 +1,16 @@
 console.log("background");
 
 chrome.runtime.onInstalled.addListener(async (details) => {
+	chrome.storage.local.set({
+		status: "enabled"
+	}).catch((err) => console.error(err));
+
+	chrome.runtime.sendMessage({
+		subject: "status changed",
+		content: "enabled"
+	}).catch((err) => null);
+
 	try {
-		chrome.storage.local.set({
-			status: "enabled"
-		}).catch((err) => console.error(err));
-
-		chrome.runtime.sendMessage({
-			subject: "status changed",
-			content: "enabled"
-		}).catch((err) => null);
-
 		const settings_initialized = (Object.keys(await chrome.storage.sync.get("settings")).length == 0 ? false : true);
 		if (!settings_initialized) {
 			await chrome.storage.sync.set({
@@ -20,7 +20,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 				}
 			});
 		}
-		
+
 		const settings = (await chrome.storage.sync.get("settings")).settings;
 		console.log(settings);
 	} catch (err) {
