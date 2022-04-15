@@ -1,7 +1,7 @@
 # ttv-favorites
 <!-- # [ttv-favorites]() -->
 
-star followed channels to add them to a "favorite channels" list in the sidebar
+star followed channels to add them to a "favorite channels" section in the sidebar
 
 <br/>
 

@@ -1,5 +1,19 @@
 console.log("foreground");
 
+const root = document.getElementsByClassName("root")[0]; // if this element exists, this page has sidebar. (MUST be class "root", NOT id "root")
+if (root && !root.children[0].classList.contains("eoQePv")) {
+	chrome.storage.local.set({
+		status: "disabled"
+	}).catch((err) => console.error(err));
+
+	chrome.runtime.sendMessage({
+		subject: "status changed",
+		content: "disabled"
+	}).catch((err) => null);
+	
+	throw new Error("css class names not up to date");
+}
+
 let [
 	settings,
 	favorites,
@@ -14,7 +28,6 @@ let [
 let ac = new AbortController();
 let clicks_since_mouse_enter = 0;
 let ctrl_key_down = false;
-const theme = document.getElementsByTagName("html")[0].classList[2].split("tw-root--theme-")[1]; // "dark"/"light"
 
 const star_indicator = create_element_from_html_string(`
 	<span class="star_indicator">⭐</span>
@@ -201,7 +214,7 @@ function remove_margin_from_squad_mode_btn() {
 
 async function add_star_btn() {
 	btns_section.insertAdjacentHTML("afterbegin", `
-		<button id="star_btn" class="${"btn_"+theme}" type="button">${(favorites.has(channel_name) ? "★" : "☆")}</button>
+		<button id="star_btn" class="${"btn_" + document.getElementsByTagName("html")[0].classList[2].split("tw-root--theme-")[1]}" type="button">${(favorites.has(channel_name) ? "★" : "☆")}</button>
 	`);
 
 	const star_btn = document.getElementById("star_btn");

@@ -2,6 +2,15 @@ console.log("background");
 
 chrome.runtime.onInstalled.addListener(async (details) => {
 	try {
+		chrome.storage.local.set({
+			status: "enabled"
+		}).catch((err) => console.error(err));
+
+		chrome.runtime.sendMessage({
+			subject: "status changed",
+			content: "enabled"
+		}).catch((err) => null);
+
 		const settings_initialized = (Object.keys(await chrome.storage.sync.get("settings")).length == 0 ? false : true);
 		if (!settings_initialized) {
 			await chrome.storage.sync.set({
@@ -11,7 +20,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 				}
 			});
 		}
-	
+		
 		const settings = (await chrome.storage.sync.get("settings")).settings;
 		console.log(settings);
 	} catch (err) {
@@ -64,7 +73,7 @@ function handle_navigation(details) {
 			}).catch((err) => null);
 		} else if (url.startsWith("https://www.twitch.tv/")) {
 			const page = url.split("https://www.twitch.tv/")[1];
-			if (page.includes("/") || page.startsWith("directory") || page.startsWith("downloads") || page.startsWith("drops") || page.startsWith("jobs") || page.startsWith("settings") || page.startsWith("store") || page.startsWith("turbo")) {
+			if (page.includes("/") || page.startsWith("directory") || page.startsWith("downloads") || page.startsWith("drops") || page.startsWith("jobs") || page.startsWith("settings") || page.startsWith("turbo")) {
 				chrome.tabs.sendMessage(details.tabId, {
 					subject: "navigation",
 					content: "non-channel"

@@ -1,5 +1,6 @@
 console.log("popup");
 
+let status = null;
 let settings = null;
 
 const stars_checkbox = document.getElementById("stars_checkbox");
@@ -9,15 +10,18 @@ const clear_favorites_btn = document.getElementById("clear_favorites_btn");
 const cancel_confirm_btns_wrapper = document.getElementById("cancel_confirm_btns_wrapper");
 const cancel_btn = document.getElementById("cancel_btn");
 const confirm_btn = document.getElementById("confirm_btn");
+const notice = document.getElementById("notice");
 
 try {
+	status = (await chrome.storage.local.get("status")).status;
+	(status == "disabled" ? notice.classList.remove("d_none") : null);
+
 	settings = (await chrome.storage.sync.get("settings")).settings;
+	stars_checkbox.checked = settings.stars;
+	hide_checkbox.checked = settings.hide;
 } catch (err) {
 	console.error(err);
 }
-
-stars_checkbox.checked = settings.stars;
-hide_checkbox.checked = settings.hide;
 
 stars_checkbox.addEventListener("change", async (evt) => {
 	settings.stars = evt.target.checked;
@@ -75,5 +79,16 @@ confirm_btn.addEventListener("click", async (evt) => {
 		}
 	} catch (err) {
 		console.error(err);
+	}
+});
+
+chrome.runtime.onMessage.addListener(async (msg, sender) => {
+	console.log(msg);
+	switch (msg.subject) {
+		case "status changed":
+			(msg.content != status ? notice.classList.toggle("d_none") : null);
+			break;
+		default:
+			break;
 	}
 });

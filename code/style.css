@@ -7,6 +7,10 @@ h3 {
 	margin: 0;
 }
 
+p {
+	margin: 0 5px;
+}
+
 label {
 	font-size: large;
 	line-height: 1;
@@ -61,4 +65,9 @@ label {
 	margin: 0 -35px 0 0;
 	padding: 3px 10.5px;
 	z-index: 999;
+}
+
+#notice {
+	background: red;
+	color: white;
 }
