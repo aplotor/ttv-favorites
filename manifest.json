@@ -2,7 +2,7 @@
 	"author": "jc9108",
 	"name": "ttv-favorites",
 	"homepage_url": "https://github.com/jc9108/ttv-favorites",
-	"description": "star followed channels to add them to a \"favorite channels\" section in the sidebar",
+	"description": "star followed channels to add them to a \"favorite channels\" section in the sidebar. for distinction / awareness / easier access to smaller channels",
 	"version": "1.0",
 	"manifest_version": 3,
 	"icons": {
