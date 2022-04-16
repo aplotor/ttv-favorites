@@ -23,26 +23,6 @@ label {
 	line-height: 1;
 }
 
-.star_indicator {
-	margin: 0 -0.15em 0 0;
-}
-
-.btn_dark {
-	background: #3a3a3d;
-}
-
-.btn_dark:hover {
-	background: #464649;
-}
-
-.btn_light {
-	background: #f2f2f2;
-}
-
-.btn_light:hover {
-	background: #e5e5e5;
-}
-
 .center {
 	text-align: center;
 }
@@ -63,15 +43,6 @@ label {
 
 .d_none {
 	display: none;
-}
-
-#star_btn {
-	font-size: 2.375rem;
-	line-height: 1;
-	border-radius: 0.175em;
-	margin: 0 -1.45em 0 0;
-	padding: 0.1375em 0.425em;
-	z-index: 999;
 }
 
 #notice {
