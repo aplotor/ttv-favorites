@@ -200,12 +200,12 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 
 function add_margin_to_squad_mode_btn() {
 	const squad_mode_btn = document.getElementsByClassName("Layout-sc-nxg1ff-0 metadata-layout__secondary-button-spacing")[0];
-	(squad_mode_btn ? squad_mode_btn.style.marginRight = "10px" : null);
+	(squad_mode_btn ? squad_mode_btn.style.marginRight = "0.4em" : null);
 }
 
 function remove_margin_from_squad_mode_btn() {
 	const squad_mode_btn = document.getElementsByClassName("Layout-sc-nxg1ff-0 metadata-layout__secondary-button-spacing")[0];
-	(squad_mode_btn ? squad_mode_btn.style.marginRight = "-30px" : null); // -30px is its default
+	(squad_mode_btn ? squad_mode_btn.style.marginRight = "-1.2em" : null); // back to default
 }
 
 async function add_star_btn() {
