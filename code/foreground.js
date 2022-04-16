@@ -80,6 +80,7 @@ const channel_mo = new MutationObserver((mutations) => {
 		const unfollow_btn = (element && element.dataset.aTarget == "unfollow-button" ? element : null);
 		if (unfollow_btn) {
 			add_margin_to_squad_mode_btn();
+
 			if (last_channel_offline) {
 				setTimeout(() => { // wait for ttv to replace btns_section
 					btns_section = document.getElementsByClassName("Layout-sc-nxg1ff-0 jtArho")[0]; // need to get this again bc ttv removes the previously retrieved one when going from offline channel to live channel
@@ -176,11 +177,10 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 				const synced_storage = await chrome.storage.sync.get(null);
 				delete synced_storage.settings;
 				favorites = new Set([...Object.keys(synced_storage)]);
+				
+				(document.getElementById("star_btn") ? refresh_star_btn().catch((err) => console.error(err)) : null); // if page has star_btn
 	
-				remove_star_btn();
-				add_star_btn().catch((err) => console.error(err));
-	
-				update_channels_lists();
+				(document.getElementsByClassName("root")[0] ? update_channels_lists() : null); // if page has sidebar
 			} catch (err) {
 				console.error(err);
 			}
@@ -274,6 +274,15 @@ async function add_star_btn() {
 function remove_star_btn() {
 	const star_btn = document.getElementById("star_btn");
 	(star_btn ? star_btn.remove() : null);
+}
+
+async function refresh_star_btn() {
+	try {
+		remove_star_btn();
+		await add_star_btn();
+	} catch (err) {
+		console.error(err);
+	}
 }
 
 async function add_favorite(channel_name) {

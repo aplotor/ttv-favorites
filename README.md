@@ -1,7 +1,7 @@
 # ttv-favorites
 <!-- # [ttv-favorites]() -->
 
-star followed channels to add them to a "favorite channels" section in the sidebar of Twitch.tv. for distinction / awareness / easier access to smaller channels
+star followed channels to add them to a "favorite channels" section in the sidebar of Twitch.tv for distinction / awareness / easier access to smaller channels
 
 <br/>
 
