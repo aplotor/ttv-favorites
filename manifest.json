@@ -26,8 +26,16 @@
 	},
 	"content_scripts": [
 		{
+			"run_at": "document_idle",
 			"matches": [
 				"https://www.twitch.tv/*"
+			],
+			"exclude_matches": [
+				"https://www.twitch.tv/downloads/*",
+				"https://www.twitch.tv/jobs/*",
+				"https://www.twitch.tv/p/*",
+				"https://www.twitch.tv/store/*",
+				"https://www.twitch.tv/turbo/*"
 			],
 			"js": [
 				"./code/foreground.js"

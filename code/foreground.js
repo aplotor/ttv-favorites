@@ -1,6 +1,6 @@
 console.log("foreground");
 
-const root = document.getElementsByClassName("root")[0]; // if this element exists, this page has sidebar. (MUST be class "root", NOT id "root")
+const root = document.getElementsByClassName("root")[0];
 if (root && !root.children[0].classList.contains("eoQePv")) {
 	chrome.storage.local.set({
 		status: "disabled"
@@ -158,18 +158,12 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 	switch (msg.subject) {
 		case "navigation":
 			channel_mo.disconnect();
-			switch (msg.content) {
-				case "non-channel":
-					break;
-				case "channel":
-					channel_mo.observe(document, {
-						attributes: true,
-						childList: true,
-						subtree: true
-					});
-					break;
-				default:
-					break;
+			if (document.getElementsByClassName("channel-root__player")[0]) {
+				channel_mo.observe(document, {
+					attributes: true,
+					childList: true,
+					subtree: true
+				});
 			}
 			break;
 		case "favorites updated":
@@ -178,9 +172,9 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 				delete synced_storage.settings;
 				favorites = new Set([...Object.keys(synced_storage)]);
 				
-				(document.getElementById("star_btn") ? refresh_star_btn().catch((err) => console.error(err)) : null); // if page has star_btn
+				(document.getElementById("star_btn") ? refresh_star_btn().catch((err) => console.error(err)) : null);
 	
-				(document.getElementsByClassName("root")[0] ? update_channels_lists() : null); // if page has sidebar
+				(document.getElementById("sideNav") ? update_channels_lists() : null);
 			} catch (err) {
 				console.error(err);
 			}
@@ -336,6 +330,8 @@ function update_channels_lists() {
 				
 				(num_replaced_channels < num_existing_channels ? favorite_channels_list.children[num_replaced_channels++].replaceWith(channel_clone) : favorite_channels_list.append(channel_clone));
 			}
+		} else {
+			break;
 		}
 	}
 

@@ -64,26 +64,8 @@ chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
 
 function handle_navigation(details) {
 	if (details.frameId == 0) {
-		const url = (details.url.endsWith("/") ? details.url.slice(0, -1) : details.url);
-		console.log(url);
-		if (url == "https://www.twitch.tv") {
-			chrome.tabs.sendMessage(details.tabId, {
-				subject: "navigation",
-				content: "non-channel"
-			}).catch((err) => null);
-		} else if (url.startsWith("https://www.twitch.tv/")) {
-			const page = url.split("https://www.twitch.tv/")[1];
-			if (page.includes("/") || page.startsWith("directory") || page.startsWith("downloads") || page.startsWith("drops") || page.startsWith("jobs") || page.startsWith("settings") || page.startsWith("turbo")) {
-				chrome.tabs.sendMessage(details.tabId, {
-					subject: "navigation",
-					content: "non-channel"
-				}).catch((err) => null);
-			} else {
-				chrome.tabs.sendMessage(details.tabId, {
-					subject: "navigation",
-					content: "channel"
-				}).catch((err) => null);	
-			}
-		};
+		chrome.tabs.sendMessage(details.tabId, {
+			subject: "navigation"
+		}).catch((err) => null);
 	}
 }
