@@ -101,6 +101,9 @@ confirm_btn.addEventListener("click", async (evt) => {
 				content: "cleared"
 			}).catch((err) => null);
 		}
+
+		favorites = [];
+		refresh_favorites_list();
 	} catch (err) {
 		console.error(err);
 	}
