@@ -67,7 +67,7 @@ const channel_mo = new MutationObserver((mutations) => {
 	btns_section = document.getElementsByClassName("Layout-sc-nxg1ff-0 jtArho")[0];
 
 	if (channel_name_wrapper && btns_section) {
-		console.log("non-self channel");
+		console.log("channel (non-self)");
 
 		channel_mo.disconnect();
 		remove_star_btn();
@@ -94,7 +94,7 @@ const channel_mo = new MutationObserver((mutations) => {
 		element = document.getElementsByClassName("ScCoreButton-sc-1qn4ixc-0 ScCoreButtonPrimary-sc-1qn4ixc-1 hmLwbE efKhMx")[0];
 		const follow_btn = (element && element.dataset.aTarget == "follow-button" ? element : null);
 	} else if (element && customize_channel_btn) {
-		console.log("self channel");
+		console.log("channel (self)");
 
 		channel_mo.disconnect();
 
@@ -164,6 +164,8 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 					childList: true,
 					subtree: true
 				});
+			} else {
+				console.log("not channel");
 			}
 			break;
 		case "favorites updated":
