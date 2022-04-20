@@ -180,8 +180,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 });
 
 function get_current_channel_name() {
-	const channel_name_wrapper = document.getElementsByClassName("CoreText-sc-cpl358-0 ScTitleText-sc-1gsen4-0 fiLmJS gasGNr InjectLayout-sc-588ddc-0 idDHLE tw-title")[0] || document.getElementsByClassName("CoreText-sc-cpl358-0 ScTitleText-sc-1gsen4-0 cyfUN gasGNr tw-title")[0]; // for live or offline, respectively
-	const channel_name = channel_name_wrapper.innerHTML;
+	const channel_name = (current_channel_offline ? document.getElementsByClassName("home-header-sticky")[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML : document.getElementsByClassName("metadata-layout__support")[0].children[0].children[0].children[0].innerHTML);
 	return channel_name;
 }
 
