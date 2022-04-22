@@ -20,7 +20,6 @@ let [
 	sidebar,
 	favorite_channels_list,
 	followed_channels_list,
-	btns_section,
 	last_channel_offline, // last visited channel
 	current_channel_offline // currently visiting channel
 ] = [];
@@ -68,18 +67,41 @@ const channel_mo = new MutationObserver((mutations) => {
 
 		last_channel_offline = current_channel_offline;
 		current_channel_offline = (document.getElementsByClassName("home")[0] ? true : false);
-
-		btns_section = document.getElementsByClassName("Layout-sc-nxg1ff-0 eNUtIR")[0];
-
+		
 		if (unfollow_btn) {
-			add_margin_to_squad_mode_btn();
+			if (last_channel_offline && !current_channel_offline) {
+				let timeout_id = null;
 
-			if (last_channel_offline) {
-				setTimeout(() => { // wait for ttv to replace btns_section
-					btns_section = document.getElementsByClassName("Layout-sc-nxg1ff-0 eNUtIR")[0]; // need to get this again bc ttv removes the previously retrieved one when going from offline channel to live channel
+				const btns_section = document.getElementsByClassName("metadata-layout__support")[0].children[1];
+				const btns_section_mo = new MutationObserver((mutations) => {
+					for (const mutation of mutations) {
+						for (const node of mutation.removedNodes) {
+							if (node.contains(btns_section)) {
+								console.log("ttv replaced btns_section");
+								btns_section_mo.disconnect();
+								clearTimeout(timeout_id);
+
+								add_margin_to_squad_mode_btn();
+								add_star_btn().catch((err) => console.error(err));
+							}
+						}
+					}
+				});
+				btns_section_mo.observe(document, {
+					attributes: true,
+					childList: true,
+					subtree: true
+				});
+
+				timeout_id = setTimeout(() => {
+					console.log("timed out");
+					btns_section_mo.disconnect();
+
+					add_margin_to_squad_mode_btn();
 					add_star_btn().catch((err) => console.error(err));
 				}, 2500);
 			} else {
+				add_margin_to_squad_mode_btn();
 				add_star_btn().catch((err) => console.error(err));
 			}
 		}
@@ -126,7 +148,7 @@ chrome.storage.sync.get(null, (items) => {
 	console.log(settings);
 
 	delete items.settings;
-	favorites = new Set([...Object.keys(items)]);
+	favorites = new Set(Object.keys(items));
 	console.log(favorites);
 });
 
@@ -141,6 +163,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 	switch (msg.subject) {
 		case "navigation":
 			channel_mo.disconnect();
+
 			if (document.getElementsByClassName("channel-root__player")[0]) {
 				console.log("channel");
 
@@ -157,7 +180,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 			try {
 				const synced_storage = await chrome.storage.sync.get(null);
 				delete synced_storage.settings;
-				favorites = new Set([...Object.keys(synced_storage)]);
+				favorites = new Set(Object.keys(synced_storage));
 				
 				(document.getElementById("star_btn") ? refresh_star_btn().catch((err) => console.error(err)) : null);
 	
@@ -179,11 +202,6 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 	}
 });
 
-function get_current_channel_name() {
-	const channel_name = (current_channel_offline ? document.getElementsByClassName("home-header-sticky")[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML : document.getElementsByClassName("metadata-layout__support")[0].children[0].children[0].children[0].innerHTML);
-	return channel_name;
-}
-
 function add_margin_to_squad_mode_btn() {
 	const element = document.getElementsByClassName("metadata-layout__secondary-button-spacing")[0];
 	if (element && element.hasChildNodes()) {
@@ -201,7 +219,7 @@ function remove_margin_from_squad_mode_btn() {
 }
 
 async function add_star_btn() {
-	const channel_name = get_current_channel_name();
+	const channel_name = (current_channel_offline ? document.getElementsByClassName("home-header-sticky")[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML : document.getElementsByClassName("metadata-layout__support")[0].children[0].children[0].children[0].innerHTML);
 
 	let star_btn = create_element_from_html_string(`
 		<button id="star_btn" class="${"btn_" + document.getElementsByTagName("html")[0].classList[2].split("tw-root--theme-")[1]}" type="button">${(favorites.has(channel_name) ? "★" : "☆")}</button>
@@ -247,22 +265,6 @@ async function add_star_btn() {
 		if (clicks_since_mouse_enter > 1) {
 			(evt.target.innerHTML == "☆" ? evt.target.innerHTML = "★" : evt.target.innerHTML = "☆");
 		}
-	});
-
-	const btns_section_mo = new MutationObserver((mutations) => {
-		for (const mutation of mutations) {
-			for (const node of mutation.removedNodes) {
-				if (node.contains(btns_section)) {
-					btns_section_mo.disconnect();
-					console.log("ttv removed btns_section");
-				}
-			}
-		}
-	});
-	btns_section_mo.observe(document, {
-		attributes: true,
-		childList: true,
-		subtree: true
 	});
 }
 
