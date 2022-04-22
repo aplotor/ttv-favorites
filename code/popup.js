@@ -18,6 +18,16 @@ const cancel_btn = document.getElementById("cancel_btn");
 const confirm_btn = document.getElementById("confirm_btn");
 const notice = document.getElementById("notice");
 
+function refresh_favorites_list() {
+	favorites_list.innerHTML = "";
+
+	for (const favorite of favorites) {
+		favorites_list.insertAdjacentHTML("beforeend", `
+			<li>${favorite}</li>
+		`);
+	}
+}
+
 try {
 	status = (await chrome.storage.local.get("status")).status;
 	(status == "disabled" ? notice.classList.remove("d_none") : null);
@@ -34,6 +44,23 @@ try {
 } catch (err) {
 	console.error(err);
 }
+
+chrome.runtime.onMessage.addListener(async (msg, sender) => {
+	console.log(msg);
+	switch (msg.subject) {
+		case "favorites updated":
+			const synced_storage = await chrome.storage.sync.get(null);		
+			delete synced_storage.settings;
+			favorites = Object.keys(synced_storage).sort((a, b) => a.localeCompare(b, "en"));
+			refresh_favorites_list();
+			break;
+		case "status changed":
+			(msg.content != status ? notice.classList.toggle("d_none") : null);
+			break;
+		default:
+			break;
+	}
+});
 
 stars_checkbox.addEventListener("change", async (evt) => {
 	settings.stars = evt.target.checked;
@@ -108,30 +135,3 @@ confirm_btn.addEventListener("click", async (evt) => {
 		console.error(err);
 	}
 });
-
-chrome.runtime.onMessage.addListener(async (msg, sender) => {
-	console.log(msg);
-	switch (msg.subject) {
-		case "favorites updated":
-			const synced_storage = await chrome.storage.sync.get(null);		
-			delete synced_storage.settings;
-			favorites = Object.keys(synced_storage).sort((a, b) => a.localeCompare(b, "en"));
-			refresh_favorites_list();
-			break;
-		case "status changed":
-			(msg.content != status ? notice.classList.toggle("d_none") : null);
-			break;
-		default:
-			break;
-	}
-});
-
-function refresh_favorites_list() {
-	favorites_list.innerHTML = "";
-
-	for (const favorite of favorites) {
-		favorites_list.insertAdjacentHTML("beforeend", `
-			<li>${favorite}</li>
-		`);
-	}
-}

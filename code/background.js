@@ -1,5 +1,13 @@
 console.log("background");
 
+function handle_navigation(details) {
+	if (details.frameId == 0) {
+		chrome.tabs.sendMessage(details.tabId, {
+			subject: "navigation"
+		}).catch((err) => null);
+	}
+}
+
 chrome.runtime.onInstalled.addListener(async (details) => {
 	chrome.storage.local.set({
 		status: "enabled"
@@ -61,11 +69,3 @@ chrome.webNavigation.onCompleted.addListener((details) => {
 chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
 	handle_navigation(details);
 });
-
-function handle_navigation(details) {
-	if (details.frameId == 0) {
-		chrome.tabs.sendMessage(details.tabId, {
-			subject: "navigation"
-		}).catch((err) => null);
-	}
-}
