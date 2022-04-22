@@ -121,87 +121,6 @@ const followed_channels_list_mo = new MutationObserver((mutations) => {
 	debounced_apply_settings_to_followed_channels_list();
 });
 
-window.addEventListener("click", (evt) => {
-	if (evt.target.closest('[data-a-target="follow-button"]')) {
-		add_margin_to_squad_mode_btn();
-		add_star_btn().catch((err) => console.error(err));
-	} else if (evt.target.closest('[data-a-target="unfollow-button"]')) {
-		remove_star_btn();
-		remove_margin_from_squad_mode_btn();
-	}
-});
-
-window.addEventListener("keydown", (evt) => {
-	if (evt.key == "Control") {
-		ctrl_key_down = true;
-		setTimeout(() => {
-			ctrl_key_down = false;
-		}, 250);
-	}
-});
-window.addEventListener("keyup", (evt) => {
-	(evt.key == "Control" ? ctrl_key_down = false : null);
-});
-
-chrome.storage.sync.get(null, (items) => {
-	settings = items.settings;
-	console.log(settings);
-
-	delete items.settings;
-	favorites = new Set(Object.keys(items));
-	console.log(favorites);
-});
-
-sidebar_mo.observe(document, {
-	attributes: true,
-	childList: true,
-	subtree: true
-});
-
-chrome.runtime.onMessage.addListener(async (msg, sender) => {
-	console.log(msg);
-	switch (msg.subject) {
-		case "navigation":
-			channel_mo.disconnect();
-
-			if (document.getElementsByClassName("channel-root__player")[0]) {
-				console.log("channel");
-
-				channel_mo.observe(document, {
-					attributes: true,
-					childList: true,
-					subtree: true
-				});
-			} else {
-				console.log("not channel");
-			}
-			break;
-		case "favorites updated":
-			try {
-				const synced_storage = await chrome.storage.sync.get(null);
-				delete synced_storage.settings;
-				favorites = new Set(Object.keys(synced_storage));
-				
-				(document.getElementById("star_btn") ? refresh_star_btn().catch((err) => console.error(err)) : null);
-	
-				(document.getElementById("sideNav") ? update_channels_lists() : null);
-			} catch (err) {
-				console.error(err);
-			}
-			break;
-		case "settings changed":
-			try {
-				settings = (await chrome.storage.sync.get("settings")).settings;
-				update_channels_lists();
-			} catch (err) {
-				console.error(err);
-			}
-			break;
-		default:
-			break;
-	}
-});
-
 function add_margin_to_squad_mode_btn() {
 	const element = document.getElementsByClassName("metadata-layout__secondary-button-spacing")[0];
 	if (element && element.hasChildNodes()) {
@@ -461,3 +380,84 @@ function create_debounced_function(fn, timeout) {
 		}, timeout);
 	};
 }
+
+chrome.storage.sync.get(null, (items) => {
+	settings = items.settings;
+	console.log(settings);
+
+	delete items.settings;
+	favorites = new Set(Object.keys(items));
+	console.log(favorites);
+});
+
+sidebar_mo.observe(document, {
+	attributes: true,
+	childList: true,
+	subtree: true
+});
+
+chrome.runtime.onMessage.addListener(async (msg, sender) => {
+	console.log(msg);
+	switch (msg.subject) {
+		case "navigation":
+			channel_mo.disconnect();
+
+			if (document.getElementsByClassName("channel-root__player")[0]) {
+				console.log("channel");
+
+				channel_mo.observe(document, {
+					attributes: true,
+					childList: true,
+					subtree: true
+				});
+			} else {
+				console.log("not channel");
+			}
+			break;
+		case "favorites updated":
+			try {
+				const synced_storage = await chrome.storage.sync.get(null);
+				delete synced_storage.settings;
+				favorites = new Set(Object.keys(synced_storage));
+				
+				(document.getElementById("star_btn") ? refresh_star_btn().catch((err) => console.error(err)) : null);
+	
+				(document.getElementById("sideNav") ? update_channels_lists() : null);
+			} catch (err) {
+				console.error(err);
+			}
+			break;
+		case "settings changed":
+			try {
+				settings = (await chrome.storage.sync.get("settings")).settings;
+				update_channels_lists();
+			} catch (err) {
+				console.error(err);
+			}
+			break;
+		default:
+			break;
+	}
+});
+
+window.addEventListener("click", (evt) => {
+	if (evt.target.closest('[data-a-target="follow-button"]')) {
+		add_margin_to_squad_mode_btn();
+		add_star_btn().catch((err) => console.error(err));
+	} else if (evt.target.closest('[data-a-target="unfollow-button"]')) {
+		remove_star_btn();
+		remove_margin_from_squad_mode_btn();
+	}
+});
+
+window.addEventListener("keydown", (evt) => {
+	if (evt.key == "Control") {
+		ctrl_key_down = true;
+		setTimeout(() => {
+			ctrl_key_down = false;
+		}, 250);
+	}
+});
+window.addEventListener("keyup", (evt) => {
+	(evt.key == "Control" ? ctrl_key_down = false : null);
+});
