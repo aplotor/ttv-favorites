@@ -43,7 +43,11 @@ const sidebar_mo = new MutationObserver((mutations) => {
 
 		const favorite_channels_section = followed_channels_section.cloneNode(true);
 		favorite_channels_section.setAttribute("aria-label", "Favorite Channels");
-		favorite_channels_section.children[0].children[1].children[0].innerHTML = "FAVORITE CHANNELS";
+		try {
+			favorite_channels_section.children[0].children[1].children[0].innerHTML = "FAVORITE CHANNELS";
+		} catch (err) {
+			favorite_channels_section.children[0].children[0].innerHTML = "FAVORITE CHANNELS";
+		}
 		favorite_channels_section.children[1].id = "favorite_channels_list";
 		favorite_channels_section.children[2].remove();
 
