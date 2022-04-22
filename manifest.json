@@ -3,7 +3,7 @@
 	"name": "ttv-favorites",
 	"description": "star followed channels to add them to a \"favorite channels\" section in the sidebar of Twitch.tv",
 	"homepage_url": "https://github.com/jc9108/ttv-favorites",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"manifest_version": 3,
 	"icons": {
 		"16": "./images/icon_16.png",
@@ -33,6 +33,7 @@
 			"exclude_matches": [
 				"https://www.twitch.tv/downloads/*",
 				"https://www.twitch.tv/jobs/*",
+				"https://www.twitch.tv/moderator/*",
 				"https://www.twitch.tv/p/*",
 				"https://www.twitch.tv/store/*",
 				"https://www.twitch.tv/turbo/*"
