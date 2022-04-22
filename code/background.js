@@ -1,7 +1,7 @@
 console.log("background");
 
 function handle_navigation(details) {
-	if (details.frameId == 0) {
+	if (details.frameId == 0 && details.url.startsWith("https://www.twitch.tv")) {
 		chrome.tabs.sendMessage(details.tabId, {
 			subject: "navigation"
 		}).catch((err) => null);
