@@ -11,3 +11,8 @@ star followed channels to add them to a "favorite channels" section in the sideb
 - note::
 	- favorites are synced to your browser account, not your Twitch account
 	- you cannot favorite more than 511 channels
+
+<hr/>
+
+- sponsors::
+	- [Peaca Music](https://www.youtube.com/channel/UCclDfum0DF1iyLPc5VBsh6g)
