@@ -28,6 +28,8 @@ let ac = new AbortController();
 let clicks_since_mouse_enter = 0;
 let ctrl_key_down = false;
 
+const theme = document.getElementsByTagName("html")[0].classList[2].split("tw-root--theme-")[1];
+
 const star_indicator = create_element_from_html_string(`
 	<span class="star_indicator">⭐</span>
 `);
@@ -144,12 +146,9 @@ function remove_margin_from_squad_mode_btn() {
 async function add_star_btn() {
 	const channel_name = (current_channel_offline ? document.getElementsByClassName("home-header-sticky")[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML : document.getElementsByClassName("metadata-layout__support")[0].children[0].children[0].children[0].innerHTML);
 
-	let star_btn = create_element_from_html_string(`
-		<button id="star_btn" class="${"btn_" + document.getElementsByTagName("html")[0].classList[2].split("tw-root--theme-")[1]}" type="button">${(favorites.has(channel_name) ? "★" : "☆")}</button>
+	const star_btn = create_element_from_html_string(`
+		<button id="star_btn" class="${"btn_" + theme}" type="button">${(favorites.has(channel_name) ? "★" : "☆")}</button>
 	`);
-	document.querySelector('[data-target="channel-header-right"]').prepend(star_btn);
-
-	star_btn = document.getElementById("star_btn");
 
 	star_btn.addEventListener("mouseenter", (evt) => {
 		(evt.target.innerHTML == "☆" ? evt.target.innerHTML = "★" : evt.target.innerHTML = "☆");
@@ -189,6 +188,8 @@ async function add_star_btn() {
 			(evt.target.innerHTML == "☆" ? evt.target.innerHTML = "★" : evt.target.innerHTML = "☆");
 		}
 	});
+
+	document.querySelector('[data-target="channel-header-right"]').prepend(star_btn);
 }
 
 function remove_star_btn() {
@@ -417,6 +418,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 			} else {
 				console.log("not channel");
 			}
+
 			break;
 		case "favorites updated":
 			try {

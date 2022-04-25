@@ -3,7 +3,8 @@ console.log("background");
 function handle_navigation(details) {
 	if (details.frameId == 0 && details.url.startsWith("https://www.twitch.tv")) {
 		chrome.tabs.sendMessage(details.tabId, {
-			subject: "navigation"
+			subject: "navigation",
+			content: details.url
 		}).catch((err) => null);
 	}
 }

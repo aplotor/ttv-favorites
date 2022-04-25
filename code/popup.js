@@ -62,7 +62,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 	}
 });
 
-stars_checkbox.addEventListener("change", async (evt) => {
+stars_checkbox.addEventListener("change", (evt) => {
 	settings.stars = evt.target.checked;
 });
 
@@ -81,7 +81,8 @@ save_btn.addEventListener("click", async (evt) => {
 		});
 		for (const tab of ttv_tabs) {
 			chrome.tabs.sendMessage(tab.id, {
-				subject: "settings changed"
+				subject: "settings changed",
+				content: null
 			}).catch((err) => null);
 		}
 	} catch (err) {
