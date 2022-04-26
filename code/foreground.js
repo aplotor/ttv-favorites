@@ -39,8 +39,15 @@ const red_dot_indicator = create_element_from_html_string(`
 
 const sidebar_mo = new MutationObserver((mutations) => {
 	sidebar = document.getElementsByClassName("side-bar-contents")[0].children[0].children[0];
-	const followed_channels_section = sidebar.children[0];
-	if (sidebar && followed_channels_section) {
+
+	let followed_channels_section = null;
+	try {
+		followed_channels_section = sidebar.children[0];
+	} catch (err) {
+		null;
+	}
+	
+	if (followed_channels_section) {
 		sidebar_mo.disconnect();
 
 		const favorite_channels_section = followed_channels_section.cloneNode(true);
@@ -51,7 +58,7 @@ const sidebar_mo = new MutationObserver((mutations) => {
 			favorite_channels_section.children[0].children[0].innerHTML = "FAVORITE CHANNELS";
 		}
 		favorite_channels_section.children[1].id = "favorite_channels_list";
-		favorite_channels_section.children[2].remove();
+		(favorite_channels_section.children[2] ? favorite_channels_section.children[2].remove() : null);
 
 		sidebar.prepend(favorite_channels_section);
 		favorite_channels_list = document.getElementById("favorite_channels_list");
