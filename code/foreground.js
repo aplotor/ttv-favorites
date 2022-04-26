@@ -88,7 +88,7 @@ const channel_mo = new MutationObserver((mutations) => {
 								clearTimeout(timeout_id);
 
 								add_margin_to_squad_mode_btn();
-								add_star_btn().catch((err) => console.error(err));
+								add_star_btn();
 							}
 						}
 					}
@@ -104,11 +104,11 @@ const channel_mo = new MutationObserver((mutations) => {
 					btns_section_mo.disconnect();
 
 					add_margin_to_squad_mode_btn();
-					add_star_btn().catch((err) => console.error(err));
+					add_star_btn();
 				}, 2500);
 			} else {
 				add_margin_to_squad_mode_btn();
-				add_star_btn().catch((err) => console.error(err));
+				add_star_btn();
 			}
 		}
 	}
@@ -143,7 +143,7 @@ function remove_margin_from_squad_mode_btn() {
 	}
 }
 
-async function add_star_btn() {
+function add_star_btn() {
 	const channel_name = (current_channel_offline ? document.getElementsByClassName("home-header-sticky")[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML : document.getElementsByClassName("metadata-layout__support")[0].children[0].children[0].children[0].innerHTML);
 
 	const star_btn = create_element_from_html_string(`
@@ -197,13 +197,9 @@ function remove_star_btn() {
 	(star_btn ? star_btn.remove() : null);
 }
 
-async function refresh_star_btn() {
-	try {
-		remove_star_btn();
-		await add_star_btn();
-	} catch (err) {
-		console.error(err);
-	}
+function refresh_star_btn() {
+	remove_star_btn();
+	add_star_btn();
 }
 
 async function add_favorite(channel_name) {
@@ -320,13 +316,13 @@ function apply_settings_to_channel(channel, for_list) {
 
 	switch (for_list) {
 		case "favorite":
-			(channel.classList.contains("d_none") ? channel.classList.remove("d_none") : null); // in case followed_channels_list_mo added class d_none to channel before it was cloned
+			channel.classList.toggle("d_none", false); // in case followed_channels_list_mo added class d_none to channel before it was cloned
 			break;
 		case "followed":
 			if (settings.hide == true) {
-				(!channel.classList.contains("d_none") ? channel.classList.add("d_none") : null);
+				channel.classList.toggle("d_none", true);
 			} else {
-				(channel.classList.contains("d_none") ? channel.classList.remove("d_none") : null);
+				channel.classList.toggle("d_none", false);
 			}
 			break;
 		default:
@@ -338,7 +334,7 @@ function remove_applied_settings_from_channel(channel) {
 	const channel_indicator = channel.children[0].children[0].children[0].children[1].children[1].children[0].children[0];
 	channel_indicator.replaceWith(red_dot_indicator.cloneNode(true));
 
-	(channel.classList.contains("d_none") ? channel.classList.remove("d_none") : null);
+	channel.classList.toggle("d_none", false);
 }
 
 function configure_channel_clone(channel_clone) {
@@ -351,7 +347,7 @@ function configure_channel_clone(channel_clone) {
 
 		if (ctrl_key_down) {
 			const channel_url = channel_clone.children[0].children[0].children[0].href;
-			window.open(channel_url, "_blank");
+			open(channel_url, "_blank");
 		} else {
 			const show_more_times_clicked = expand_followed_channels_list();
 
@@ -426,7 +422,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 				delete synced_storage.settings;
 				favorites = new Set(Object.keys(synced_storage));
 				
-				(document.getElementById("star_btn") ? refresh_star_btn().catch((err) => console.error(err)) : null);
+				(document.getElementById("star_btn") ? refresh_star_btn() : null);
 	
 				(document.getElementById("sideNav") ? update_channels_lists() : null);
 			} catch (err) {
@@ -449,7 +445,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 window.addEventListener("click", (evt) => {
 	if (evt.target.closest('[data-a-target="follow-button"]')) {
 		add_margin_to_squad_mode_btn();
-		add_star_btn().catch((err) => console.error(err));
+		add_star_btn();
 	} else if (evt.target.closest('[data-a-target="unfollow-button"]')) {
 		remove_star_btn();
 		remove_margin_from_squad_mode_btn();
