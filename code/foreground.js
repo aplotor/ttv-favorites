@@ -26,10 +26,10 @@ let [
 
 let ac = new AbortController();
 let clicks_since_mouse_enter = 0;
-let ctrl_key_down = false;
 
 const theme = document.getElementsByTagName("html")[0].classList[2].split("tw-root--theme-")[1];
 
+const list_channel_query = '[class="ScTransitionBase-sc-eg1bd7-0 dpqRKW tw-transition"]';
 const star_indicator = create_element_from_html_string(`
 	<span class="star_indicator">⭐</span>
 `);
@@ -326,11 +326,7 @@ function apply_settings_to_channel(channel, for_list) {
 			channel.classList.toggle("d_none", false); // in case followed_channels_list_mo added class d_none to channel before it was cloned
 			break;
 		case "followed":
-			if (settings.hide == true) {
-				channel.classList.toggle("d_none", true);
-			} else {
-				channel.classList.toggle("d_none", false);
-			}
+			channel.classList.toggle("d_none", settings.hide);
 			break;
 		default:
 			break;
@@ -352,7 +348,7 @@ function configure_channel_clone(channel_clone) {
 	channel_clone.addEventListener("click", (evt) => { // need this for client-side routing bc fsr even with deep clone, clicking on channel_clone by default does a full page reload
 		evt.preventDefault();
 
-		if (ctrl_key_down) {
+		if (evt.ctrlKey) {
 			const channel_url = channel_clone.children[0].children[0].children[0].href;
 			open(channel_url, "_blank");
 		} else {
@@ -449,7 +445,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 	}
 });
 
-window.addEventListener("click", (evt) => {
+window.addEventListener("click", async (evt) => {
 	if (evt.target.closest('[data-a-target="follow-button"]')) {
 		add_margin_to_squad_mode_btn();
 		add_star_btn();
@@ -457,16 +453,17 @@ window.addEventListener("click", (evt) => {
 		remove_star_btn();
 		remove_margin_from_squad_mode_btn();
 	}
-});
 
-window.addEventListener("keydown", (evt) => {
-	if (evt.key == "Control") {
-		ctrl_key_down = true;
-		setTimeout(() => {
-			ctrl_key_down = false;
-		}, 250);
+	if (evt.altKey && evt.target.closest(list_channel_query)) {
+		evt.preventDefault();
+
+		const channel = evt.target.closest(list_channel_query);
+		const channel_name = channel.children[0].children[0].children[0].children[1].children[0].children[0].children[0].title.split(" ")[0];
+		try {
+			(favorites.has(channel_name) ? await remove_favorite(channel_name) : await add_favorite(channel_name));
+			(document.getElementById("star_btn") ? refresh_star_btn() : null);
+		} catch (err) {
+			console.error(err);
+		}
 	}
-});
-window.addEventListener("keyup", (evt) => {
-	(evt.key == "Control" ? ctrl_key_down = false : null);
 });
