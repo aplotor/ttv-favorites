@@ -348,7 +348,9 @@ function configure_channel_clone(channel_clone) {
 	channel_clone.addEventListener("click", (evt) => { // need this for client-side routing bc fsr even with deep clone, clicking on channel_clone by default does a full page reload
 		evt.preventDefault();
 
-		if (evt.ctrlKey) {
+		if (evt.altKey) {
+			return;
+		} else if (evt.ctrlKey) {
 			const channel_url = channel_clone.children[0].children[0].children[0].href;
 			open(channel_url, "_blank");
 		} else {
