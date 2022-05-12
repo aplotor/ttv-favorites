@@ -1,6 +1,7 @@
 # ignore
 **/.*
 **/#*
+zip.zip
 node_modules/
 
 # keep
