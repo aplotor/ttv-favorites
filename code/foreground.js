@@ -139,7 +139,7 @@ function add_margin_to_squad_mode_btn() {
 	const element = document.getElementsByClassName("metadata-layout__secondary-button-spacing")[0];
 	if (element && element.hasChildNodes()) {
 		const squad_mode_btn = element.children[0];
-		squad_mode_btn.style.setProperty("margin", "0 3em 0 0");
+		squad_mode_btn.style.setProperty("margin", "0 3.1em 0 0");
 	}
 }
 
@@ -457,8 +457,14 @@ window.addEventListener("click", async (evt) => {
 		add_margin_to_squad_mode_btn();
 		add_star_btn();
 	} else if (evt.target.closest('[data-a-target="unfollow-button"]')) {
-		remove_star_btn();
-		remove_margin_from_squad_mode_btn();
+		window.addEventListener("click", (evt) => {
+			if (evt.target.innerHTML == "Yes, unfollow") {
+				remove_star_btn();
+				remove_margin_from_squad_mode_btn();
+			}
+		}, {
+			once: true
+		});
 	}
 
 	if (evt.altKey && evt.target.closest(list_channel_query)) {
