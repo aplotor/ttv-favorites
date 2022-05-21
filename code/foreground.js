@@ -139,7 +139,7 @@ function add_margin_to_squad_mode_btn() {
 	const element = document.getElementsByClassName("metadata-layout__secondary-button-spacing")[0];
 	if (element && element.hasChildNodes()) {
 		const squad_mode_btn = element.children[0];
-		squad_mode_btn.style.marginRight = "3em";
+		squad_mode_btn.style.setProperty("margin", "0 3em 0 0");
 	}
 }
 
@@ -147,7 +147,7 @@ function remove_margin_from_squad_mode_btn() {
 	const element = document.getElementsByClassName("metadata-layout__secondary-button-spacing")[0];
 	if (element && element.hasChildNodes()) {
 		const squad_mode_btn = element.children[0];
-		squad_mode_btn.style.marginRight = 0;
+		squad_mode_btn.style.removeProperty("margin");
 	}
 }
 
