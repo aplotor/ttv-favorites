@@ -36,6 +36,7 @@
 				"https://www.twitch.tv/moderator/*",
 				"https://www.twitch.tv/p/*",
 				"https://www.twitch.tv/store/*",
+				"https://www.twitch.tv/team/*",
 				"https://www.twitch.tv/turbo/*"
 			],
 			"js": [
