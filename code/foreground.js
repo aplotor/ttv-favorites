@@ -18,6 +18,7 @@ let [
 	settings,
 	favorites,
 	sidebar,
+	favorite_channels_section,
 	favorite_channels_list,
 	followed_channels_list,
 	last_channel_offline, // last visited channel
@@ -50,7 +51,7 @@ const sidebar_mo = new MutationObserver((mutations) => {
 	if (followed_channels_section) {
 		sidebar_mo.disconnect();
 
-		const favorite_channels_section = followed_channels_section.cloneNode(true);
+		favorite_channels_section = followed_channels_section.cloneNode(true);
 		favorite_channels_section.setAttribute("aria-label", "Favorite Channels");
 		try {
 			favorite_channels_section.children[0].children[1].children[0].innerHTML = "FAVORITE CHANNELS";
@@ -272,6 +273,10 @@ function update_channels_lists() {
 	}
 
 	unexpand_followed_channels_list(show_more_times_clicked);
+
+	if (favorite_channels_list.children.length == 0) {
+		(settings.section == false ? favorite_channels_section.style.setProperty("display", "none", "important") : favorite_channels_section.style.removeProperty("display"));
+	}
 
 	console.log("update_channels_lists completed");
 }

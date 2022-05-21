@@ -13,25 +13,26 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 	chrome.storage.local.set({
 		status: "enabled"
 	}).catch((err) => console.error(err));
-
 	chrome.runtime.sendMessage({
 		subject: "status changed",
 		content: "enabled"
 	}).catch((err) => null);
 
+	const default_settings = {
+		section: true,
+		stars: true,
+		hide: true
+	};
 	try {
-		const settings_initialized = (Object.keys(await chrome.storage.sync.get("settings")).length == 0 ? false : true);
-		if (!settings_initialized) {
-			await chrome.storage.sync.set({
-				settings: {
-					stars: true,
-					hide: true
-				}
-			});
+		let settings = (await chrome.storage.sync.get("settings")).settings;
+		(!settings ? settings = {} : null);
+		for (const setting in default_settings) {
+			(!(setting in settings) ? settings[setting] = default_settings[setting] : null);
 		}
-
-		const settings = (await chrome.storage.sync.get("settings")).settings;
 		console.log(settings);
+		await chrome.storage.sync.set({
+			settings: settings
+		});
 	} catch (err) {
 		console.error(err);
 	}

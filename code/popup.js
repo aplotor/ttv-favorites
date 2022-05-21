@@ -6,6 +6,7 @@ let [
 	favorites
 ] = [];
 
+const section_checkbox = document.getElementById("section_checkbox");
 const stars_checkbox = document.getElementById("stars_checkbox");
 const hide_checkbox = document.getElementById("hide_checkbox");
 const save_btn = document.getElementById("save_btn");
@@ -35,6 +36,7 @@ try {
 	const synced_storage = await chrome.storage.sync.get(null);
 
 	settings = synced_storage.settings;
+	section_checkbox.checked = settings.section;
 	stars_checkbox.checked = settings.stars;
 	hide_checkbox.checked = settings.hide;
 
@@ -60,6 +62,10 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 		default:
 			break;
 	}
+});
+
+section_checkbox.addEventListener("change", (evt) => {
+	settings.section = evt.target.checked;
 });
 
 stars_checkbox.addEventListener("change", (evt) => {
