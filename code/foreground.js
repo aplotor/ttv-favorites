@@ -314,7 +314,9 @@ function unexpand_followed_channels_list(show_more_times_clicked) {
 
 function apply_settings_to_channel(channel, for_list) {
 	const channel_indicator = channel.querySelector(".tw-channel-status-indicator") || channel.querySelector(".star_indicator");
-	channel_indicator.replaceWith((settings.stars == true ? star_indicator.cloneNode(true) : red_dot_indicator.cloneNode(true)));
+	if (channel_indicator) { // not rerun
+		channel_indicator.replaceWith((settings.stars == true ? star_indicator.cloneNode(true) : red_dot_indicator.cloneNode(true)));
+	}
 
 	switch (for_list) {
 		case "favorite":
@@ -330,7 +332,9 @@ function apply_settings_to_channel(channel, for_list) {
 
 function remove_applied_settings_from_channel(channel) {
 	const channel_indicator = channel.querySelector(".tw-channel-status-indicator") || channel.querySelector(".star_indicator");
-	channel_indicator.replaceWith(red_dot_indicator.cloneNode(true));
+	if (channel_indicator) { // not rerun
+		channel_indicator.replaceWith(red_dot_indicator.cloneNode(true));
+	}
 
 	channel.classList.toggle("d_none", false);
 }
