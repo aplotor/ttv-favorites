@@ -6,18 +6,18 @@ let [
 	favorites
 ] = [];
 
-const section_checkbox = document.getElementById("section_checkbox");
-const stars_checkbox = document.getElementById("stars_checkbox");
-const hide_checkbox = document.getElementById("hide_checkbox");
-const save_btn = document.getElementById("save_btn");
-const view_favorites_btn = document.getElementById("view_favorites_btn");
-const hide_favorites_btn = document.getElementById("hide_favorites_btn");
-const favorites_list = document.getElementById("favorites_list");
-const clear_favorites_btn = document.getElementById("clear_favorites_btn");
-const cancel_confirm_btns_wrapper = document.getElementById("cancel_confirm_btns_wrapper");
-const cancel_btn = document.getElementById("cancel_btn");
-const confirm_btn = document.getElementById("confirm_btn");
-const notice = document.getElementById("notice");
+const section_checkbox = document.querySelector("#section_checkbox");
+const stars_checkbox = document.querySelector("#stars_checkbox");
+const hide_checkbox = document.querySelector("#hide_checkbox");
+const save_btn = document.querySelector("#save_btn");
+const view_favorites_btn = document.querySelector("#view_favorites_btn");
+const hide_favorites_btn = document.querySelector("#hide_favorites_btn");
+const favorites_list = document.querySelector("#favorites_list");
+const clear_favorites_btn = document.querySelector("#clear_favorites_btn");
+const cancel_confirm_btns_wrapper = document.querySelector("#cancel_confirm_btns_wrapper");
+const cancel_btn = document.querySelector("#cancel_btn");
+const confirm_btn = document.querySelector("#confirm_btn");
+const notice = document.querySelector("#notice");
 
 function refresh_favorites_list() {
 	favorites_list.innerHTML = "";
