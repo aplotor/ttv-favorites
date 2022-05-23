@@ -113,7 +113,7 @@ const channel_mo = new MutationObserver((mutations) => {
 	}
 });
 
-const debounced_apply_settings_to_followed_channels_list = create_debounced_function(() => {
+const debounced_modify_followed_channels_list = create_debounced_function(() => {
 	for (const channel of followed_channels_list.children) {
 		const channel_live = (channel.querySelector("span").innerHTML == "Offline" ? false : true);
 		if (channel_live) {
@@ -123,7 +123,7 @@ const debounced_apply_settings_to_followed_channels_list = create_debounced_func
 	}
 }, 50);
 const followed_channels_list_mo = new MutationObserver((mutations) => {
-	debounced_apply_settings_to_followed_channels_list();
+	debounced_modify_followed_channels_list();
 });
 
 function create_element_from_html_string(html_string) {

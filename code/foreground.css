@@ -1,9 +1,6 @@
-.star_indicator {
-	margin: 0 -0.35em 0 0;
-}
-
 .btn_dark {
 	background: #3a3a3d;
+	color: white;
 }
 
 .btn_dark:hover {
@@ -12,6 +9,7 @@
 
 .btn_light {
 	background: #f2f2f2;
+	color: black;
 }
 
 .btn_light:hover {
@@ -20,6 +18,10 @@
 
 .d_none {
 	display: none;
+}
+
+.star_indicator {
+	margin: 0 -0.35em 0 0;
 }
 
 #star_btn {
