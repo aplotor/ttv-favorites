@@ -1,3 +1,7 @@
+.d_none {
+	display: none;
+}
+
 .btn_dark {
 	background: #3a3a3d;
 	color: white;
@@ -14,10 +18,6 @@
 
 .btn_light:hover {
 	background: #e5e5e5;
-}
-
-.d_none {
-	display: none;
 }
 
 .star_indicator {

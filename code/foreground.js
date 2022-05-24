@@ -40,7 +40,6 @@ const red_dot_indicator = create_element_from_html_string(`
 
 const sidebar_mo = new MutationObserver((mutations) => {
 	const sidebar = document.querySelector(".side-bar-contents").children[0].children[0];
-
 	followed_channels_section = sidebar.querySelector('[aria-label="Followed Channels"]');
 	if (followed_channels_section) {
 		sidebar_mo.disconnect();
@@ -63,7 +62,6 @@ const channel_mo = new MutationObserver((mutations) => {
 	const customize_channel_btn = document.querySelector('[href^="https://dashboard.twitch.tv/u/"][href$="/settings/channel"]');
 	const follow_btn = document.querySelector('[data-a-target="follow-button"]');
 	const unfollow_btn = document.querySelector('[data-a-target="unfollow-button"]');
-
 	if (customize_channel_btn || follow_btn || unfollow_btn) {
 		channel_mo.disconnect();
 		remove_star_btn();
@@ -159,6 +157,32 @@ function remove_margin_from_squad_mode_btn() {
 	}
 }
 
+async function add_favorite(channel_name) {
+	favorites.add(channel_name);
+	update_channels_lists();
+	
+	await chrome.storage.sync.set({
+		[channel_name]: null // value doesnt matter, only need key existence
+	});
+	console.log(`favorited (${channel_name})`);
+	chrome.runtime.sendMessage({
+		subject: "favorites updated",
+		content: "added"
+	}).catch((err) => null);
+}
+
+async function remove_favorite(channel_name) {
+	favorites.delete(channel_name);
+	update_channels_lists();
+
+	await chrome.storage.sync.remove(channel_name);
+	console.log(`unfavorited (${channel_name})`);
+	chrome.runtime.sendMessage({
+		subject: "favorites updated",
+		content: "removed"
+	}).catch((err) => null);
+}
+
 function add_star_btn() {
 	const channel_name = document.querySelector("h1.tw-title").innerHTML;
 
@@ -216,32 +240,6 @@ function remove_star_btn() {
 function refresh_star_btn() {
 	remove_star_btn();
 	add_star_btn();
-}
-
-async function add_favorite(channel_name) {
-	favorites.add(channel_name);
-	update_channels_lists();
-	
-	await chrome.storage.sync.set({
-		[channel_name]: null // value doesnt matter, only need key existence
-	});
-	console.log(`favorited (${channel_name})`);
-	chrome.runtime.sendMessage({
-		subject: "favorites updated",
-		content: "added"
-	}).catch((err) => null);
-}
-
-async function remove_favorite(channel_name) {
-	favorites.delete(channel_name);
-	update_channels_lists();
-
-	await chrome.storage.sync.remove(channel_name);
-	console.log(`unfavorited (${channel_name})`);
-	chrome.runtime.sendMessage({
-		subject: "favorites updated",
-		content: "removed"
-	}).catch((err) => null);
 }
 
 function expand_followed_channels_list() {
@@ -404,8 +402,6 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 	console.log(msg);
 	switch (msg.subject) {
 		case "navigation":
-			channel_mo.disconnect();
-
 			if (document.querySelector(".channel-root__player")) {
 				console.log("channel");
 
@@ -417,7 +413,6 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 			} else {
 				console.log("not channel");
 			}
-
 			break;
 		case "favorites updated":
 			try {
