@@ -30,7 +30,6 @@ let clicks_since_mouse_enter = 0;
 
 const theme = document.querySelector("html").classList[2].split("tw-root--theme-")[1];
 
-const list_channel_query = '[class="ScTransitionBase-sc-eg1bd7-0 dpqRKW tw-transition"]';
 const star_indicator = create_element_from_html_string(`
 	<span class="star_indicator">⭐</span>
 `);
@@ -90,7 +89,7 @@ const channel_mo = new MutationObserver((mutations) => {
 						}
 					}
 				});
-				btns_section_mo.observe(document, {
+				btns_section_mo.observe(document.body, {
 					attributes: true,
 					childList: true,
 					subtree: true
@@ -113,6 +112,8 @@ const channel_mo = new MutationObserver((mutations) => {
 
 const debounced_modify_followed_channels_list = create_debounced_function(() => {
 	for (const channel of followed_channels_list.children) {
+		channel.classList.toggle("list_channel", true);
+
 		const channel_live = (channel.querySelector("span").innerHTML == "Offline" ? false : true);
 		if (channel_live) {
 			const channel_name = channel.querySelector('p[data-a-target="side-nav-title"]').title.split(" ")[0];
@@ -244,7 +245,7 @@ function refresh_star_btn() {
 
 function expand_followed_channels_list() {
 	let show_more_btn = followed_channels_section.querySelector('[data-a-target="side-nav-show-more-button"]');
-	let last_element = [...followed_channels_list.children].at(-1); // the last element of followed_channels_list
+	let last_element = [...(followed_channels_list.children)].at(-1); // the last element of followed_channels_list
 	let last_element_live = (last_element.querySelector("span").innerHTML == "Offline" ? false : true); // whether the CHANNEL corresponding w last_element is live or not
 
 	let show_more_times_clicked = 0;
@@ -253,7 +254,7 @@ function expand_followed_channels_list() {
 		show_more_times_clicked++;
 		
 		show_more_btn = followed_channels_section.querySelector('[data-a-target="side-nav-show-more-button"]');
-		last_element = [...followed_channels_list.children].at(-1);
+		last_element = [...(followed_channels_list.children)].at(-1);
 		last_element_live = (last_element.querySelector("span").innerHTML == "Offline" ? false : true);
 	}
 	console.log(`show more clicked (${show_more_times_clicked}) time${(show_more_times_clicked == 1 ? "" : "s")}`);
@@ -302,6 +303,7 @@ function remove_applied_settings_from_channel(channel) {
 }
 
 function configure_channel_clone(channel_clone) {
+	channel_clone.classList.toggle("list_channel", true);
 	apply_settings_to_channel(channel_clone, "favorite");
 
 	const channel_clone_name = channel_clone.querySelector('p[data-a-target="side-nav-title"]').title.split(" ")[0];
@@ -363,7 +365,7 @@ function update_channels_lists() {
 
 	const num_leftover_channels = num_existing_channels - num_replaced_channels;
 	for (let i = 0; i < num_leftover_channels; i++) {
-		const last_element = [...favorite_channels_list.children].at(-1);
+		const last_element = [...(favorite_channels_list.children)].at(-1);
 		last_element.remove();
 	}
 
@@ -392,7 +394,7 @@ chrome.storage.sync.get(null, (items) => {
 	console.log(favorites);
 });
 
-sidebar_mo.observe(document, {
+sidebar_mo.observe(document.body, {
 	attributes: true,
 	childList: true,
 	subtree: true
@@ -405,7 +407,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 			if (document.querySelector(".channel-root__player")) {
 				console.log("channel");
 
-				channel_mo.observe(document, {
+				channel_mo.observe(document.body, {
 					attributes: true,
 					childList: true,
 					subtree: true
@@ -455,10 +457,10 @@ window.addEventListener("click", async (evt) => {
 		});
 	}
 
-	if (evt.altKey && evt.target.closest(list_channel_query)) {
+	if (evt.altKey && evt.target.closest(".list_channel")) {
 		evt.preventDefault();
 
-		const channel = evt.target.closest(list_channel_query);
+		const channel = evt.target.closest(".list_channel");
 		const channel_name = channel.querySelector('p[data-a-target="side-nav-title"]').title.split(" ")[0];
 		try {
 			(favorites.has(channel_name) ? await remove_favorite(channel_name) : await add_favorite(channel_name));
