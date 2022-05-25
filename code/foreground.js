@@ -112,7 +112,7 @@ const channel_mo = new MutationObserver((mutations) => {
 
 const debounced_modify_followed_channels_list = create_debounced_function(() => {
 	for (const channel of followed_channels_list.children) {
-		channel.classList.toggle("list_channel", true);
+		channel.classList.add("list_channel");
 
 		const channel_live = (channel.querySelector("span").innerHTML == "Offline" ? false : true);
 		if (channel_live) {
@@ -283,7 +283,7 @@ function apply_settings_to_channel(channel, for_list) {
 
 	switch (for_list) {
 		case "favorite":
-			channel.classList.toggle("d_none", false); // in case followed_channels_list_mo added class d_none to channel before it was cloned
+			channel.classList.remove("d_none"); // in case followed_channels_list_mo added class d_none to channel before it was cloned
 			break;
 		case "followed":
 			channel.classList.toggle("d_none", settings.hide);
@@ -299,11 +299,11 @@ function remove_applied_settings_from_channel(channel) {
 		channel_indicator.replaceWith(red_dot_indicator.cloneNode(true));
 	}
 
-	channel.classList.toggle("d_none", false);
+	channel.classList.remove("d_none");
 }
 
 function configure_channel_clone(channel_clone) {
-	channel_clone.classList.toggle("list_channel", true);
+	channel_clone.classList.add("list_channel");
 	apply_settings_to_channel(channel_clone, "favorite");
 
 	const channel_clone_name = channel_clone.querySelector('p[data-a-target="side-nav-title"]').title.split(" ")[0];
