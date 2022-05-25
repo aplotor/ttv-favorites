@@ -1,19 +1,5 @@
 console.log("foreground");
 
-const root = document.querySelector(".root");
-if (root && !root.children[0].classList.contains("bGJmZt")) {
-	chrome.storage.local.set({
-		status: "disabled"
-	}).catch((err) => console.error(err));
-
-	chrome.runtime.sendMessage({
-		subject: "status changed",
-		content: "disabled"
-	}).catch((err) => null);
-	
-	throw new Error("class names outdated");
-}
-
 let [
 	settings,
 	favorites,
@@ -21,6 +7,8 @@ let [
 	favorite_channels_section,
 	followed_channels_list,
 	favorite_channels_list,
+	star_indicator,
+	red_dot_indicator,
 	last_channel_offline, // last visited channel
 	current_channel_offline // currently visiting channel
 ] = [];
@@ -29,13 +17,6 @@ let ac = new AbortController();
 let clicks_since_mouse_enter = 0;
 
 const theme = document.querySelector("html").classList[2].split("tw-root--theme-")[1];
-
-const star_indicator = create_element_from_html_string(`
-	<span class="star_indicator">⭐</span>
-`);
-const red_dot_indicator = create_element_from_html_string(`
-	<div class="ScChannelStatusIndicator-sc-1cf6j56-0 dtUsEc tw-channel-status-indicator" data-test-selector="0"></div>
-`);
 
 const sidebar_mo = new MutationObserver((mutations) => {
 	const sidebar = document.querySelector(".side-bar-contents").children[0].children[0];
@@ -52,6 +33,11 @@ const sidebar_mo = new MutationObserver((mutations) => {
 		const show_more_less_btns_container = favorite_channels_section.querySelector(".side-nav-show-more-toggle__button");
 		(show_more_less_btns_container ? show_more_less_btns_container.remove() : null);
 		sidebar.prepend(favorite_channels_section);
+
+		star_indicator = create_element_from_html_string(`
+			<span class="star_indicator">⭐</span>
+		`);
+		red_dot_indicator = document.querySelector(".tw-channel-status-indicator");
 		
 		cycle_update_channels_lists();
 	}

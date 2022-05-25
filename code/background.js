@@ -10,15 +10,6 @@ function handle_navigation(details) {
 }
 
 chrome.runtime.onInstalled.addListener(async (details) => {
-	chrome.storage.local.set({
-		status: "enabled"
-	}).catch((err) => console.error(err));
-	
-	chrome.runtime.sendMessage({
-		subject: "status changed",
-		content: "enabled"
-	}).catch((err) => null);
-
 	const default_settings = {
 		section: true,
 		stars: true,

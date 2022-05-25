@@ -1,7 +1,6 @@
 console.log("popup");
 
 let [
-	status,
 	settings,
 	favorites
 ] = [];
@@ -17,7 +16,6 @@ const clear_favorites_btn = document.querySelector("#clear_favorites_btn");
 const cancel_confirm_btns_wrapper = document.querySelector("#cancel_confirm_btns_wrapper");
 const cancel_btn = document.querySelector("#cancel_btn");
 const confirm_btn = document.querySelector("#confirm_btn");
-const notice = document.querySelector("#notice");
 
 function refresh_favorites_list() {
 	favorites_list.innerHTML = "";
@@ -30,9 +28,6 @@ function refresh_favorites_list() {
 }
 
 try {
-	status = (await chrome.storage.local.get("status")).status;
-	(status == "disabled" ? notice.classList.remove("d_none") : null);
-
 	const synced_storage = await chrome.storage.sync.get(null);
 
 	settings = synced_storage.settings;
@@ -55,9 +50,6 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 			delete synced_storage.settings;
 			favorites = Object.keys(synced_storage).sort((a, b) => a.localeCompare(b, "en"));
 			refresh_favorites_list();
-			break;
-		case "status changed":
-			(msg.content != status ? notice.classList.toggle("d_none") : null);
 			break;
 		default:
 			break;

@@ -55,8 +55,3 @@ a:hover {
 .d_none {
 	display: none;
 }
-
-#notice {
-	background: red;
-	color: white;
-}
