@@ -20,7 +20,7 @@ const theme = document.querySelector("html").classList[2].split("tw-root--theme-
 
 const sidebar_mo = new MutationObserver((mutations) => {
 	const sidebar = document.querySelector(".side-bar-contents").children[0].children[0];
-	followed_channels_section = sidebar.querySelector('[aria-label="Followed Channels"]');
+	followed_channels_section = sidebar.querySelector('[aria-label="Followed Channels"]') || sidebar.querySelector('[aria-label][role="group"]');
 	if (followed_channels_section) {
 		sidebar_mo.disconnect();
 
