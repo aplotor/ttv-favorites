@@ -464,6 +464,11 @@ async function main() {
 			}
 		}
 	});
+
+	chrome.runtime.sendMessage({
+		subject: "trigger navigation",
+		content: window.location.href
+	}).catch((err) => null);
 }
 
 main().catch((err) => console.error(err));
