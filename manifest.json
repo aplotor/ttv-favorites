@@ -3,7 +3,7 @@
 	"name": "ttv-favorites",
 	"description": "enables favorites on Twitch.tv",
 	"homepage_url": "https://github.com/jc9108/ttv-favorites",
-	"version": "1.2.6",
+	"version": "1.2.7",
 	"manifest_version": 3,
 	"icons": {
 		"16": "./images/icon_16.png",
@@ -35,6 +35,7 @@
 				"https://www.twitch.tv/jobs/*",
 				"https://www.twitch.tv/moderator/*",
 				"https://www.twitch.tv/p/*",
+				"https://www.twitch.tv/popout/*",
 				"https://www.twitch.tv/store/*",
 				"https://www.twitch.tv/team/*",
 				"https://www.twitch.tv/turbo/*"
