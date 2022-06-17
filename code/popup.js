@@ -27,9 +27,9 @@ function refresh_favorites_list() {
 	}
 }
 
-try {
+async function main() {
 	const synced_storage = await chrome.storage.sync.get(null);
-
+	
 	settings = synced_storage.settings;
 	section_checkbox.checked = settings.section;
 	stars_checkbox.checked = settings.stars;
@@ -38,99 +38,99 @@ try {
 	delete synced_storage.settings;
 	favorites = Object.keys(synced_storage).sort((a, b) => a.localeCompare(b, "en"));
 	refresh_favorites_list();
-} catch (err) {
-	console.error(err);
+	
+	chrome.runtime.onMessage.addListener(async (msg, sender) => {
+		console.log(msg);
+		switch (msg.subject) {
+			case "favorites updated":
+				const synced_storage = await chrome.storage.sync.get(null);		
+				delete synced_storage.settings;
+				favorites = Object.keys(synced_storage).sort((a, b) => a.localeCompare(b, "en"));
+				refresh_favorites_list();
+				break;
+			default:
+				break;
+		}
+	});
+	
+	section_checkbox.addEventListener("change", (evt) => {
+		settings.section = evt.target.checked;
+	});
+	
+	stars_checkbox.addEventListener("change", (evt) => {
+		settings.stars = evt.target.checked;
+	});
+	
+	hide_checkbox.addEventListener("change", (evt) => {
+		settings.hide = evt.target.checked;
+	});
+	
+	save_btn.addEventListener("click", async (evt) => {
+		try {
+			await chrome.storage.sync.set({
+				settings: settings
+			});
+		
+			const ttv_tabs = await chrome.tabs.query({
+				url: "https://www.twitch.tv/*"
+			});
+			for (const tab of ttv_tabs) {
+				chrome.tabs.sendMessage(tab.id, {
+					subject: "settings changed",
+					content: null
+				}).catch((err) => null);
+			}
+		} catch (err) {
+			console.error(err);
+		}
+	});
+	
+	view_favorites_btn.addEventListener("click", (evt) => {
+		evt.target.classList.add("d_none");
+		hide_favorites_btn.classList.remove("d_none");
+		favorites_list.classList.remove("d_none");
+	});
+	
+	hide_favorites_btn.addEventListener("click", (evt) => {
+		evt.target.classList.add("d_none");
+		view_favorites_btn.classList.remove("d_none");
+		favorites_list.classList.add("d_none");
+	});
+	
+	clear_favorites_btn.addEventListener("click", (evt) => {
+		cancel_confirm_btns_wrapper.classList.toggle("d_none");
+	});
+	
+	cancel_btn.addEventListener("click", (evt) => {
+		cancel_confirm_btns_wrapper.classList.add("d_none");
+	});
+	
+	confirm_btn.addEventListener("click", async (evt) => {
+		cancel_confirm_btns_wrapper.classList.add("d_none");
+	
+		try {
+			const synced_settings = (await chrome.storage.sync.get("settings")).settings;
+			await chrome.storage.sync.clear();
+			await chrome.storage.sync.set({
+				settings: synced_settings
+			});
+		
+			const ttv_tabs = await chrome.tabs.query({
+				url: "https://www.twitch.tv/*"
+			});
+			for (const tab of ttv_tabs) {
+				chrome.tabs.sendMessage(tab.id, {
+					subject: "favorites updated",
+					content: "cleared"
+				}).catch((err) => null);
+			}
+	
+			favorites = [];
+			refresh_favorites_list();
+		} catch (err) {
+			console.error(err);
+		}
+	});
 }
 
-chrome.runtime.onMessage.addListener(async (msg, sender) => {
-	console.log(msg);
-	switch (msg.subject) {
-		case "favorites updated":
-			const synced_storage = await chrome.storage.sync.get(null);		
-			delete synced_storage.settings;
-			favorites = Object.keys(synced_storage).sort((a, b) => a.localeCompare(b, "en"));
-			refresh_favorites_list();
-			break;
-		default:
-			break;
-	}
-});
-
-section_checkbox.addEventListener("change", (evt) => {
-	settings.section = evt.target.checked;
-});
-
-stars_checkbox.addEventListener("change", (evt) => {
-	settings.stars = evt.target.checked;
-});
-
-hide_checkbox.addEventListener("change", (evt) => {
-	settings.hide = evt.target.checked;
-});
-
-save_btn.addEventListener("click", async (evt) => {
-	try {
-		await chrome.storage.sync.set({
-			settings: settings
-		});
-	
-		const ttv_tabs = await chrome.tabs.query({
-			url: "https://www.twitch.tv/*"
-		});
-		for (const tab of ttv_tabs) {
-			chrome.tabs.sendMessage(tab.id, {
-				subject: "settings changed",
-				content: null
-			}).catch((err) => null);
-		}
-	} catch (err) {
-		console.error(err);
-	}
-});
-
-view_favorites_btn.addEventListener("click", (evt) => {
-	evt.target.classList.add("d_none");
-	hide_favorites_btn.classList.remove("d_none");
-	favorites_list.classList.remove("d_none");
-});
-
-hide_favorites_btn.addEventListener("click", (evt) => {
-	evt.target.classList.add("d_none");
-	view_favorites_btn.classList.remove("d_none");
-	favorites_list.classList.add("d_none");
-});
-
-clear_favorites_btn.addEventListener("click", (evt) => {
-	cancel_confirm_btns_wrapper.classList.toggle("d_none");
-});
-
-cancel_btn.addEventListener("click", (evt) => {
-	cancel_confirm_btns_wrapper.classList.add("d_none");
-});
-
-confirm_btn.addEventListener("click", async (evt) => {
-	cancel_confirm_btns_wrapper.classList.add("d_none");
-
-	try {
-		const synced_settings = (await chrome.storage.sync.get("settings")).settings;
-		await chrome.storage.sync.clear();
-		await chrome.storage.sync.set({
-			settings: synced_settings
-		});
-	
-		const ttv_tabs = await chrome.tabs.query({
-			url: "https://www.twitch.tv/*"
-		});
-		for (const tab of ttv_tabs) {
-			chrome.tabs.sendMessage(tab.id, {
-				subject: "favorites updated",
-				content: "cleared"
-			}).catch((err) => null);
-		}
-
-		favorites = [];
-		refresh_favorites_list();
-	} catch (err) {
-		console.error(err);
-	}
-});
+main().catch((err) => console.error(err));

@@ -3,24 +3,23 @@ console.log("foreground");
 let [
 	settings,
 	favorites,
+	theme,
 	followed_channels_section,
 	favorite_channels_section,
 	followed_channels_list,
 	favorite_channels_list,
 	star_indicator,
 	red_dot_indicator,
-	last_channel_offline, // last visited channel
-	current_channel_offline // currently visiting channel
+	prev_channel_offline, // last visited channel
+	curr_channel_offline // currently visiting channel
 ] = [];
 
 let ac = new AbortController();
 let clicks_since_mouse_enter = 0;
 
-const theme = document.querySelector("html").classList[2].split("tw-root--theme-")[1];
-
 const sidebar_mo = new MutationObserver((mutations) => {
 	const sidebar = document.querySelector(".side-bar-contents").children[0].children[0];
-	followed_channels_section = sidebar.querySelector('[aria-label="Followed Channels"]') || sidebar.querySelector('[aria-label][role="group"]');
+	followed_channels_section = sidebar.querySelector('.side-nav-section[role="group"]');
 	if (followed_channels_section) {
 		sidebar_mo.disconnect();
 
@@ -51,13 +50,13 @@ const channel_mo = new MutationObserver((mutations) => {
 		channel_mo.disconnect();
 		remove_star_btn();
 
-		last_channel_offline = current_channel_offline;
-		// console.log(`last channel offline (${last_channel_offline})`);
-		current_channel_offline = (document.querySelector(".home") ? true : false);
-		// console.log(`current channel offline (${current_channel_offline})`);
+		prev_channel_offline = curr_channel_offline;
+		// console.log(`last channel offline (${prev_channel_offline})`);
+		curr_channel_offline = (document.querySelector(".home") ? true : false);
+		// console.log(`current channel offline (${curr_channel_offline})`);
 		
 		if (unfollow_btn) {
-			if (last_channel_offline && !current_channel_offline) {
+			if (prev_channel_offline && !curr_channel_offline) {
 				let timeout_id = null;
 
 				const btns_section = document.querySelector(".metadata-layout__support").children[1];
@@ -294,14 +293,14 @@ function configure_channel_clone(channel_clone) {
 
 	const channel_clone_name = channel_clone.querySelector('p[data-a-target="side-nav-title"]').title.split(" ")[0];
 
-	channel_clone.addEventListener("click", (evt) => { // need this for client-side routing bc fsr even with deep clone, clicking on channel_clone by default does a full page reload
+	channel_clone.addEventListener("click", (evt) => { // need this for client-side routing navigation bc fsr even with deep clone, clicking on channel_clone by default does a top-level navigation
 		evt.preventDefault();
 
 		if (evt.altKey) {
 			return;
 		} else if (evt.ctrlKey) {
 			const channel_url = channel_clone.querySelector("a.side-nav-card__link.tw-link").href;
-			open(channel_url, "_blank");
+			window.open(channel_url, "_blank");
 		} else {
 			const show_more_times_clicked = expand_followed_channels_list();
 
@@ -371,88 +370,100 @@ function cycle_update_channels_lists() {
 	}, 30000);
 }
 
-chrome.storage.sync.get(null, (items) => {
-	settings = items.settings;
+async function main() {
+	const logged_in = (document.querySelector('[data-a-target="login-button"]') ? false : true);
+	if (!logged_in) {
+		console.log("not logged in. exiting main...");
+		return;
+	}
+	
+	const synced_storage = await chrome.storage.sync.get(null);
+
+	settings = synced_storage.settings;
 	console.log(settings);
 
-	delete items.settings;
-	favorites = new Set(Object.keys(items));
+	delete synced_storage.settings;
+	favorites = new Set(Object.keys(synced_storage));
 	console.log(favorites);
-});
 
-sidebar_mo.observe(document.body, {
-	attributes: true,
-	childList: true,
-	subtree: true
-});
+	sidebar_mo.observe(document.body, {
+		attributes: true,
+		childList: true,
+		subtree: true
+	});
 
-chrome.runtime.onMessage.addListener(async (msg, sender) => {
-	console.log(msg);
-	switch (msg.subject) {
-		case "navigation":
-			if (document.querySelector(".channel-root__player")) {
-				console.log("channel");
-
-				channel_mo.observe(document.body, {
-					attributes: true,
-					childList: true,
-					subtree: true
-				});
-			} else {
-				console.log("not channel");
-			}
-			break;
-		case "favorites updated":
-			try {
-				const synced_storage = await chrome.storage.sync.get(null);
-				delete synced_storage.settings;
-				favorites = new Set(Object.keys(synced_storage));
-				
-				(document.querySelector("#star_btn") ? refresh_star_btn() : null);
+	theme = document.querySelector("html").classList[2].split("tw-root--theme-")[1];
 	
-				(document.querySelector("#sideNav") ? update_channels_lists() : null);
-			} catch (err) {
-				console.error(err);
-			}
-			break;
-		case "settings changed":
-			try {
-				settings = (await chrome.storage.sync.get("settings")).settings;
-				update_channels_lists();
-			} catch (err) {
-				console.error(err);
-			}
-			break;
-		default:
-			break;
-	}
-});
-
-window.addEventListener("click", async (evt) => {
-	if (evt.target.closest('[data-a-target="follow-button"]')) {
-		add_margin_to_squad_mode_btn();
-		add_star_btn();
-	} else if (evt.target.closest('[data-a-target="unfollow-button"]')) {
-		window.addEventListener("click", (evt) => {
-			if (evt.target.innerHTML == "Yes, unfollow") {
-				remove_star_btn();
-				remove_margin_from_squad_mode_btn();
-			}
-		}, {
-			once: true
-		});
-	}
-
-	if (evt.altKey && evt.target.closest(".list_channel")) {
-		evt.preventDefault();
-
-		const channel = evt.target.closest(".list_channel");
-		const channel_name = channel.querySelector('p[data-a-target="side-nav-title"]').title.split(" ")[0];
-		try {
-			(favorites.has(channel_name) ? await remove_favorite(channel_name) : await add_favorite(channel_name));
-			(document.querySelector("#star_btn") ? refresh_star_btn() : null);
-		} catch (err) {
-			console.error(err);
+	chrome.runtime.onMessage.addListener(async (msg, sender) => {
+		console.log(msg);
+		switch (msg.subject) {
+			case "navigation":
+				if (document.querySelector(".channel-root__player")) {
+					console.log("channel");
+	
+					channel_mo.observe(document.body, {
+						attributes: true,
+						childList: true,
+						subtree: true
+					});
+				} else {
+					console.log("not channel");
+				}
+				break;
+			case "favorites updated":
+				try {
+					const synced_storage = await chrome.storage.sync.get(null);
+					delete synced_storage.settings;
+					favorites = new Set(Object.keys(synced_storage));
+					
+					(document.querySelector("#star_btn") ? refresh_star_btn() : null);
+		
+					(document.querySelector("#sideNav") ? update_channels_lists() : null);
+				} catch (err) {
+					console.error(err);
+				}
+				break;
+			case "settings changed":
+				try {
+					settings = (await chrome.storage.sync.get("settings")).settings;
+					update_channels_lists();
+				} catch (err) {
+					console.error(err);
+				}
+				break;
+			default:
+				break;
 		}
-	}
-});
+	});
+	
+	document.body.addEventListener("click", async (evt) => {
+		if (evt.target.closest('[data-a-target="follow-button"]')) {
+			add_margin_to_squad_mode_btn();
+			add_star_btn();
+		} else if (evt.target.closest('[data-a-target="unfollow-button"]')) {
+			document.body.addEventListener("click", (evt) => {
+				if (evt.target.closest('[data-a-target="modal-unfollow-button"]')) {
+					remove_star_btn();
+					remove_margin_from_squad_mode_btn();
+				}
+			}, {
+				once: true
+			});
+		}
+	
+		if (evt.altKey && evt.target.closest(".list_channel")) {
+			evt.preventDefault();
+	
+			const channel = evt.target.closest(".list_channel");
+			const channel_name = channel.querySelector('p[data-a-target="side-nav-title"]').title.split(" ")[0];
+			try {
+				(favorites.has(channel_name) ? await remove_favorite(channel_name) : await add_favorite(channel_name));
+				(document.querySelector("#star_btn") ? refresh_star_btn() : null);
+			} catch (err) {
+				console.error(err);
+			}
+		}
+	});
+}
+
+main().catch((err) => console.error(err));
