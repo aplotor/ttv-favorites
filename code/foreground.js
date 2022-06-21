@@ -59,7 +59,7 @@ const channel_mo = new MutationObserver((mutations) => {
 			if (prev_channel_offline && !curr_channel_offline) {
 				let timeout_id = null;
 
-				const btns_section = document.querySelector(".metadata-layout__support").children[1];
+				const btns_section = document.querySelector('[data-target="channel-header-right"]');
 				const btns_section_mo = new MutationObserver((mutations) => {
 					for (const mutation of mutations) {
 						for (const node of mutation.removedNodes) {
@@ -75,7 +75,7 @@ const channel_mo = new MutationObserver((mutations) => {
 					}
 				});
 				btns_section_mo.observe(document.body, {
-					attributes: true,
+					attributes: false,
 					childList: true,
 					subtree: true
 				});
@@ -215,7 +215,8 @@ function add_star_btn() {
 		}
 	});
 
-	document.querySelector('[data-target="channel-header-right"]').prepend(star_btn);
+	const btns_section = document.querySelector('[data-target="channel-header-right"]');
+	btns_section.prepend(star_btn);
 }
 
 function remove_star_btn() {
@@ -324,9 +325,9 @@ function update_channels_lists() {
 	followed_channels_list_mo.disconnect();
 	followed_channels_list = followed_channels_section.querySelector(".tw-transition-group"); // need to get this per cycle bc ttv occasionally replaces followed_channels_list w a new one
 	followed_channels_list_mo.observe(followed_channels_list, {
-		attributes: true,
+		attributes: false,
 		childList: true,
-		subtree: true
+		subtree: false
 	});
 
 	const show_more_times_clicked = expand_followed_channels_list();
@@ -387,7 +388,7 @@ async function main() {
 	console.log(favorites);
 
 	sidebar_mo.observe(document.body, {
-		attributes: true,
+		attributes: false,
 		childList: true,
 		subtree: true
 	});
@@ -402,7 +403,7 @@ async function main() {
 					console.log("channel");
 	
 					channel_mo.observe(document.body, {
-						attributes: true,
+						attributes: false,
 						childList: true,
 						subtree: true
 					});
