@@ -309,7 +309,13 @@ function configure_channel_clone(channel_clone) {
 				const channel_name = channel.querySelector('p[data-a-target="side-nav-title"]').title.split(" ")[0];
 				if (channel_name == channel_clone_name) {
 					const channel_anchor = channel.querySelector("a.side-nav-card__link.tw-link");
-					channel_anchor.click();
+					if (evt.shiftKey) {
+						channel_anchor.dispatchEvent(new MouseEvent("click", {
+							shiftKey: true
+						}));
+					} else {
+						channel_anchor.click();
+					}
 					break;
 				}
 			}
