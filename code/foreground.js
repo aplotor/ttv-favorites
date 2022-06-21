@@ -295,27 +295,26 @@ function configure_channel_clone(channel_clone) {
 	const channel_clone_name = channel_clone.querySelector('p[data-a-target="side-nav-title"]').title.split(" ")[0];
 
 	channel_clone.addEventListener("click", (evt) => { // need this for client-side routing navigation bc fsr even with deep clone, clicking on channel_clone by default does a top-level navigation
-		evt.preventDefault();
-
 		if (evt.altKey) {
+			evt.preventDefault();
 			return;
+		} else if (evt.shiftKey) {
+			null;
 		} else if (evt.ctrlKey) {
+			evt.preventDefault();
+
 			const channel_url = channel_clone.querySelector("a.side-nav-card__link.tw-link").href;
 			window.open(channel_url, "_blank");
 		} else {
+			evt.preventDefault();
+			
 			const show_more_times_clicked = expand_followed_channels_list();
 
 			for (const channel of followed_channels_list.children) {
 				const channel_name = channel.querySelector('p[data-a-target="side-nav-title"]').title.split(" ")[0];
 				if (channel_name == channel_clone_name) {
 					const channel_anchor = channel.querySelector("a.side-nav-card__link.tw-link");
-					if (evt.shiftKey) {
-						channel_anchor.dispatchEvent(new MouseEvent("click", {
-							shiftKey: true
-						}));
-					} else {
-						channel_anchor.click();
-					}
+					channel_anchor.click();
 					break;
 				}
 			}
