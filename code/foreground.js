@@ -332,7 +332,7 @@ function update_channels_lists() {
 	followed_channels_list_mo.observe(followed_channels_list, {
 		attributes: false,
 		childList: true,
-		subtree: false
+		subtree: true
 	});
 
 	const show_more_times_clicked = expand_followed_channels_list();
