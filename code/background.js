@@ -22,15 +22,6 @@ function main() {
 		}
 	});
 
-	chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
-		if (details.frameId == 0 && details.url.startsWith("https://www.twitch.tv")) {
-			chrome.tabs.sendMessage(details.tabId, {
-				subject: "navigation",
-				content: details.url
-			}).catch((err) => null);
-		}
-	});
-	
 	chrome.runtime.onMessage.addListener(async (msg, sender) => {
 		console.log(msg);
 		switch (msg.subject) {
@@ -60,6 +51,15 @@ function main() {
 				break;
 			default:
 				break;
+		}
+	});
+
+	chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
+		if (details.frameId == 0 && details.url.startsWith("https://www.twitch.tv")) {
+			chrome.tabs.sendMessage(details.tabId, {
+				subject: "navigation",
+				content: details.url
+			}).catch((err) => null);
 		}
 	});
 }

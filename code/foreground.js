@@ -131,7 +131,7 @@ function add_margin_to_squad_mode_btn() {
 	const element = document.querySelector(".metadata-layout__secondary-button-spacing");
 	if (element && element.hasChildNodes()) {
 		const squad_mode_btn = element.children[0];
-		squad_mode_btn.style.setProperty("margin", "0 3.1em 0 0");
+		squad_mode_btn.style.setProperty("margin", "0 0.825em 0 0");
 	}
 }
 
