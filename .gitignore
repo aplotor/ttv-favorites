@@ -1,8 +1,8 @@
 # ignore
-**/.*
-**/#*
-zip.zip
+\#*
+.*
 node_modules/
+zip.zip
 
 # keep
 !.git*

@@ -3,6 +3,6 @@
 		"zip": "zip ./zip.zip -r ./manifest.json ./code/ ./images/"
 	},
 	"devDependencies": {
-		"@types/chrome": "^0.0.181"
+		"@types/chrome": "0.0.181"
 	}
 }
