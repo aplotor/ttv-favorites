@@ -18,7 +18,7 @@ let ac = new AbortController();
 let clicks_since_mouse_enter = 0;
 
 const sidebar_mo = new MutationObserver((mutations) => {
-	const sidebar = document.querySelector(".side-bar-contents").children[0].children[0];
+	const sidebar = document.querySelector(".side-bar-contents").children[0].children[0].children[0];
 	followed_channels_section = sidebar.querySelector('.side-nav-section[role="group"]');
 	if (followed_channels_section) {
 		sidebar_mo.disconnect();
@@ -133,7 +133,7 @@ function add_margin_to_squad_mode_btn() {
 	const element = document.querySelector(".metadata-layout__secondary-button-spacing");
 	if (element && element.hasChildNodes()) {
 		const squad_mode_btn = element.children[0];
-		squad_mode_btn.style.setProperty("margin", "0 0.825em 0 0");
+		squad_mode_btn.style.setProperty("margin", "0 0.83em 0 0");
 	}
 }
 
