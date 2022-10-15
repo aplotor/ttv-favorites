@@ -11,9 +11,3 @@ enables favorites on Twitch.tv
 - note::
 	- favorites are synced to your browser account, not your Twitch account
 	- you cannot favorite more than 511 channels
-
-<hr/>
-
-- sponsors::
-	- [Peaca Music](https://www.youtube.com/channel/UCclDfum0DF1iyLPc5VBsh6g)
-	- [OG-Bread](https://github.com/OG-Bread)
