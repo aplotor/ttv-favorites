@@ -105,7 +105,7 @@ const debounced_modify_followed_channels_list = create_debounced_function(() => 
 			(favorites.has(channel_name) ? apply_settings_to_channel(channel, "followed") : remove_applied_settings_from_channel(channel));
 		}
 	}
-}, 50);
+}, 250, false);
 const followed_channels_list_mo = new MutationObserver((mutations) => {
 	debounced_modify_followed_channels_list();
 });
@@ -117,12 +117,14 @@ function create_element_from_html_string(html_string) {
 	return element;
 }
 
-function create_debounced_function(fn, timeout) {
-	let timer = null;
-	return () => {
-		(timer ? clearTimeout(timer) : null);
-		timer = setTimeout(() => {
+function create_debounced_function(fn, timeout, exec_leading) {
+	let timeout_id = null;
+	return function () {
+		(exec_leading && !timeout_id ? fn.apply(this, arguments) : null);
+		(timeout_id ? clearTimeout(timeout_id) : null);
+		timeout_id = setTimeout(() => {
 			fn.apply(this, arguments);
+			timeout_id = null;
 		}, timeout);
 	};
 }
@@ -337,8 +339,8 @@ function update_channels_lists() {
 
 	const show_more_times_clicked = expand_followed_channels_list();
 
-	const num_existing_channels = favorite_channels_list.children.length;
-	let num_replaced_channels = 0;
+	const existing_channel_count = favorite_channels_list.children.length;
+	let replaced_channel_count = 0;
 	for (const channel of followed_channels_list.children) {
 		const channel_live = (channel.querySelector("span").innerHTML == "Offline" ? false : true);
 		if (channel_live) {
@@ -347,15 +349,15 @@ function update_channels_lists() {
 				const channel_clone = channel.cloneNode(true);
 				configure_channel_clone(channel_clone);
 				
-				(num_replaced_channels < num_existing_channels ? favorite_channels_list.children[num_replaced_channels++].replaceWith(channel_clone) : favorite_channels_list.append(channel_clone));
+				(replaced_channel_count < existing_channel_count ? favorite_channels_list.children[replaced_channel_count++].replaceWith(channel_clone) : favorite_channels_list.append(channel_clone));
 			}
 		} else {
 			break;
 		}
 	}
 
-	const num_leftover_channels = num_existing_channels - num_replaced_channels;
-	for (let i = 0; i < num_leftover_channels; i++) {
+	const leftover_channel_count = existing_channel_count - replaced_channel_count;
+	for (let i = 0; i < leftover_channel_count; i++) {
 		const last_element = [...(favorite_channels_list.children)].at(-1);
 		last_element.remove();
 	}
