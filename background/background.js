@@ -1,5 +1,3 @@
-console.log("background");
-
 function main() {
 	chrome.runtime.onInstalled.addListener(async (details) => {
 		const default_settings = {
@@ -23,9 +21,8 @@ function main() {
 	});
 
 	chrome.runtime.onMessage.addListener(async (msg, sender) => {
-		console.log(msg);
 		switch (msg.subject) {
-			case "trigger navigation":
+			case "ready":
 				chrome.tabs.sendMessage(sender.tab.id, {
 					subject: "navigation",
 					content: msg.content

@@ -3,7 +3,7 @@
 	"name": "ttv-favorites",
 	"description": "enables favorites on Twitch.tv",
 	"homepage_url": "https://github.com/jc9108/ttv-favorites",
-	"version": "1.2.11",
+	"version": "1.2.12",
 	"manifest_version": 3,
 	"icons": {
 		"16": "./images/icon_16.png",
@@ -18,11 +18,16 @@
 			"32": "./images/icon_32.png"
 		},
 		"default_title": "ttv-favorites",
-		"default_popup": "./code/popup.html"
+		"default_popup": "./popup/popup.html"
 	},
+	"permissions": [
+		"storage",
+		"tabs",
+		"webNavigation"
+	],
 	"background": {
 		"type": "module",
-		"service_worker": "./code/background.js"
+		"service_worker": "./build/background.js"
 	},
 	"content_scripts": [
 		{
@@ -41,16 +46,11 @@
 				"https://www.twitch.tv/turbo/*"
 			],
 			"js": [
-				"./code/foreground.js"
+				"./build/foreground.js"
 			],
 			"css": [
-				"./code/foreground.css"
+				"./foreground/foreground.css"
 			]
 		}
-	],
-	"permissions": [
-		"storage",
-		"tabs",
-		"webNavigation"
 	]
 }

@@ -1,8 +1,14 @@
 {
+	"type": "module",
 	"scripts": {
-		"zip": "zip ./zip.zip -r ./manifest.json ./code/ ./images/"
+		"dev": "vite build --watch",
+		"build": "vite build"
 	},
 	"devDependencies": {
-		"@types/chrome": "0.0.181"
+		"@types/chrome": "0.0.199",
+		"vite": "3.2.2"
+	},
+	"dependencies": {
+		"underscore": "1.13.6"
 	}
 }

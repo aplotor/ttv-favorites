@@ -1,4 +1,4 @@
-console.log("foreground");
+import underscore from "underscore";
 
 let [
 	settings,
@@ -95,7 +95,7 @@ const channel_mo = new MutationObserver((mutations) => {
 	}
 });
 
-const debounced_modify_followed_channels_list = create_debounced_function(() => {
+const debounced_modify_followed_channels_list = underscore.debounce(() => {
 	for (const channel of followed_channels_list.children) {
 		channel.classList.add("list_channel");
 
@@ -105,7 +105,7 @@ const debounced_modify_followed_channels_list = create_debounced_function(() => 
 			(favorites.has(channel_name) ? apply_settings_to_channel(channel, "followed") : remove_applied_settings_from_channel(channel));
 		}
 	}
-}, 250, false);
+}, 250);
 const followed_channels_list_mo = new MutationObserver((mutations) => {
 	debounced_modify_followed_channels_list();
 });
@@ -115,18 +115,6 @@ function create_element_from_html_string(html_string) {
 	dummy.innerHTML = html_string;
 	const element = dummy.children[0];
 	return element;
-}
-
-function create_debounced_function(fn, timeout, exec_leading) {
-	let timeout_id = null;
-	return function () {
-		(exec_leading && !timeout_id ? fn.apply(this, arguments) : null);
-		(timeout_id ? clearTimeout(timeout_id) : null);
-		timeout_id = setTimeout(() => {
-			fn.apply(this, arguments);
-			timeout_id = null;
-		}, timeout);
-	};
 }
 
 function add_margin_to_squad_mode_btn() {
@@ -402,8 +390,36 @@ async function main() {
 
 	theme = document.querySelector("html").classList[2].split("tw-root--theme-")[1];
 	
+	document.body.addEventListener("click", async (evt) => {
+		if (evt.target.closest('[data-a-target="follow-button"]')) {
+			add_margin_to_squad_mode_btn();
+			add_star_btn();
+		} else if (evt.target.closest('[data-a-target="unfollow-button"]')) {
+			document.body.addEventListener("click", (evt) => {
+				if (evt.target.closest('[data-a-target="modal-unfollow-button"]')) {
+					remove_star_btn();
+					remove_margin_from_squad_mode_btn();
+				}
+			}, {
+				once: true
+			});
+		}
+	
+		if (evt.altKey && evt.target.closest(".list_channel")) {
+			evt.preventDefault();
+	
+			const channel = evt.target.closest(".list_channel");
+			const channel_name = channel.querySelector('p[data-a-target="side-nav-title"]').title.split(" ")[0];
+			try {
+				(favorites.has(channel_name) ? await remove_favorite(channel_name) : await add_favorite(channel_name));
+				(document.querySelector("#star_btn") ? refresh_star_btn() : null);
+			} catch (err) {
+				console.error(err);
+			}
+		}
+	});
+
 	chrome.runtime.onMessage.addListener(async (msg, sender) => {
-		console.log(msg);
 		switch (msg.subject) {
 			case "navigation":
 				if (document.querySelector(".channel-root__player")) {
@@ -443,38 +459,9 @@ async function main() {
 				break;
 		}
 	});
-	
-	document.body.addEventListener("click", async (evt) => {
-		if (evt.target.closest('[data-a-target="follow-button"]')) {
-			add_margin_to_squad_mode_btn();
-			add_star_btn();
-		} else if (evt.target.closest('[data-a-target="unfollow-button"]')) {
-			document.body.addEventListener("click", (evt) => {
-				if (evt.target.closest('[data-a-target="modal-unfollow-button"]')) {
-					remove_star_btn();
-					remove_margin_from_squad_mode_btn();
-				}
-			}, {
-				once: true
-			});
-		}
-	
-		if (evt.altKey && evt.target.closest(".list_channel")) {
-			evt.preventDefault();
-	
-			const channel = evt.target.closest(".list_channel");
-			const channel_name = channel.querySelector('p[data-a-target="side-nav-title"]').title.split(" ")[0];
-			try {
-				(favorites.has(channel_name) ? await remove_favorite(channel_name) : await add_favorite(channel_name));
-				(document.querySelector("#star_btn") ? refresh_star_btn() : null);
-			} catch (err) {
-				console.error(err);
-			}
-		}
-	});
 
 	chrome.runtime.sendMessage({
-		subject: "trigger navigation",
+		subject: "ready",
 		content: window.location.href
 	}).catch((err) => null);
 }

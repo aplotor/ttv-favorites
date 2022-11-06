@@ -1,5 +1,3 @@
-console.log("popup");
-
 let [
 	settings,
 	favorites
@@ -38,20 +36,6 @@ async function main() {
 	delete synced_storage.settings;
 	favorites = Object.keys(synced_storage).sort((a, b) => a.localeCompare(b, "en"));
 	refresh_favorites_list();
-	
-	chrome.runtime.onMessage.addListener(async (msg, sender) => {
-		console.log(msg);
-		switch (msg.subject) {
-			case "favorites updated":
-				const synced_storage = await chrome.storage.sync.get(null);		
-				delete synced_storage.settings;
-				favorites = Object.keys(synced_storage).sort((a, b) => a.localeCompare(b, "en"));
-				refresh_favorites_list();
-				break;
-			default:
-				break;
-		}
-	});
 	
 	section_checkbox.addEventListener("change", (evt) => {
 		settings.section = evt.target.checked;
@@ -129,6 +113,19 @@ async function main() {
 			refresh_favorites_list();
 		} catch (err) {
 			console.error(err);
+		}
+	});
+
+	chrome.runtime.onMessage.addListener(async (msg, sender) => {
+		switch (msg.subject) {
+			case "favorites updated":
+				const synced_storage = await chrome.storage.sync.get(null);		
+				delete synced_storage.settings;
+				favorites = Object.keys(synced_storage).sort((a, b) => a.localeCompare(b, "en"));
+				refresh_favorites_list();
+				break;
+			default:
+				break;
 		}
 	});
 }
