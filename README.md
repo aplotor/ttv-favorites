@@ -9,5 +9,6 @@ enables favorites on Twitch.tv
 - demo::
 	- ![demo](./images/demo.gif)
 - note::
-	- favorites are synced to your browser account, not your Twitch account
+	- the left sidebar on Twitch.tv must be expanded for this extension to work
+	- favorites are synced to your browser account, not your Twitch.tv account
 	- you cannot favorite more than 511 channels

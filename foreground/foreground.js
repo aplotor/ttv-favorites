@@ -18,21 +18,23 @@ let ac = new AbortController();
 let clicks_since_mouse_enter = 0;
 
 const sidebar_mo = new MutationObserver((mutations) => {
-	const sidebar = document.querySelector(".side-bar-contents").children[0].children[0].children[0];
-	followed_channels_section = sidebar.querySelector('.side-nav-section[role="group"]');
-	if (followed_channels_section) {
+	const sidebar = document.querySelector("#side-nav").children[0].children[0];
+	followed_channels_section = sidebar.querySelectorAll('.side-nav-section[role="group"]')[0];
+	const recommended_channels_section = sidebar.querySelectorAll('.side-nav-section[role="group"]')[1];
+	if (followed_channels_section && recommended_channels_section) {
 		sidebar_mo.disconnect();
 
 		favorite_channels_section = followed_channels_section.cloneNode(true);
 		favorite_channels_section.setAttribute("aria-label", "Favorite Channels");
-		const section_header = favorite_channels_section.querySelector(".side-nav-header > .side-nav-header-text > h2") || favorite_channels_section.querySelector(".side-nav-header > h2");
-		section_header.innerHTML = "FAVORITE CHANNELS";
+		const section_header = recommended_channels_section.querySelector(".side-nav-header").cloneNode(true);
+		section_header.querySelector("h2").innerHTML = "FAVORITE CHANNELS";
+		favorite_channels_section.children[0].replaceWith(section_header);
 		favorite_channels_list = favorite_channels_section.querySelector(".tw-transition-group");
 		favorite_channels_list.innerHTML = "";
 		const show_more_less_btns_container = favorite_channels_section.querySelector(".side-nav-show-more-toggle__button");
 		(show_more_less_btns_container ? show_more_less_btns_container.remove() : null);
-		sidebar.prepend(favorite_channels_section);
-
+		followed_channels_section.before(favorite_channels_section);
+	
 		star_indicator = create_element_from_html_string(`
 			<span class="star_indicator">⭐</span>
 		`);
@@ -372,23 +374,25 @@ async function main() {
 		console.log("not logged in. exiting main...");
 		return;
 	}
-	
+
+	const sidebar_expanded = (document.querySelector("#side-nav").querySelector(".side-nav__title") ? true : false);
+	if (!sidebar_expanded) {
+		console.log("sidebar not expanded. exiting main...");
+		return;
+	}
+
 	const synced_storage = await chrome.storage.sync.get(null);
-
 	settings = synced_storage.settings;
-	console.log(settings);
-
 	delete synced_storage.settings;
 	favorites = new Set(Object.keys(synced_storage));
-	console.log(favorites);
+	
+	theme = document.querySelector("html").classList[2].split("tw-root--theme-")[1];
 
 	sidebar_mo.observe(document.body, {
 		attributes: false,
 		childList: true,
 		subtree: true
 	});
-
-	theme = document.querySelector("html").classList[2].split("tw-root--theme-")[1];
 	
 	document.body.addEventListener("click", async (evt) => {
 		if (evt.target.closest('[data-a-target="follow-button"]')) {
@@ -423,15 +427,11 @@ async function main() {
 		switch (msg.subject) {
 			case "navigation":
 				if (document.querySelector(".channel-root__player")) {
-					console.log("channel");
-	
 					channel_mo.observe(document.body, {
 						attributes: false,
 						childList: true,
 						subtree: true
 					});
-				} else {
-					console.log("not channel");
 				}
 				break;
 			case "favorites updated":
