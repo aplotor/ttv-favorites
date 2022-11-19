@@ -3,21 +3,21 @@
 }
 
 .btn_dark {
-	background: #3a3a3d;
-	color: white;
+	background: #2a2a2d;
+	color: #efeff1;
 }
 
 .btn_dark:hover {
-	background: #464649;
+	background: #363639;
 }
 
 .btn_light {
 	background: #f2f2f2;
-	color: black;
+	color: #0e0e10;
 }
 
 .btn_light:hover {
-	background: #e5e5e5;
+	background: #ebebeb;
 }
 
 .star_indicator {
