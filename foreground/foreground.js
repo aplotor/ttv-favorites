@@ -260,14 +260,17 @@ function apply_settings_to_channel(channel, for_list) {
 	}
 
 	switch (for_list) {
-		case "favorite":
+		case "favorite": {
 			channel.classList.remove("d_none"); // in case followed_channels_list_mo added class d_none to channel before it was cloned
 			break;
-		case "followed":
+		}
+		case "followed": {
 			channel.classList.toggle("d_none", settings.hide);
 			break;
-		default:
+		}
+		default: {
 			break;
+		}
 	}
 }
 
@@ -425,7 +428,7 @@ async function main() {
 
 	chrome.runtime.onMessage.addListener(async (msg, sender) => {
 		switch (msg.subject) {
-			case "navigation":
+			case "navigation": {
 				if (document.querySelector(".channel-root__player")) {
 					channel_mo.observe(document.body, {
 						attributes: false,
@@ -434,7 +437,8 @@ async function main() {
 					});
 				}
 				break;
-			case "favorites updated":
+			}
+			case "favorites updated": {
 				try {
 					const synced_storage = await chrome.storage.sync.get(null);
 					delete synced_storage.settings;
@@ -447,7 +451,8 @@ async function main() {
 					console.error(err);
 				}
 				break;
-			case "settings changed":
+			}
+			case "settings changed": {
 				try {
 					settings = (await chrome.storage.sync.get("settings")).settings;
 					update_channels_lists();
@@ -455,15 +460,14 @@ async function main() {
 					console.error(err);
 				}
 				break;
-			default:
+			}
+			default: {
 				break;
+			}
 		}
 	});
 
-	chrome.runtime.sendMessage({
-		subject: "ready",
-		content: window.location.href
-	}).catch((err) => null);
+	chrome.runtime.connect({name: "foreground"});
 }
 
 main().catch((err) => console.error(err));

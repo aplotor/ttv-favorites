@@ -118,14 +118,16 @@ async function main() {
 
 	chrome.runtime.onMessage.addListener(async (msg, sender) => {
 		switch (msg.subject) {
-			case "favorites updated":
+			case "favorites updated": {
 				const synced_storage = await chrome.storage.sync.get(null);		
 				delete synced_storage.settings;
 				favorites = Object.keys(synced_storage).sort((a, b) => a.localeCompare(b, "en"));
 				refresh_favorites_list();
 				break;
-			default:
+			}
+			default: {
 				break;
+			}
 		}
 	});
 }

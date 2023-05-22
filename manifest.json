@@ -3,8 +3,9 @@
 	"name": "ttv-favorites",
 	"description": "enables favorites on Twitch.tv",
 	"homepage_url": "https://github.com/jc9108/ttv-favorites",
-	"version": "1.2.16",
+	"version": "1.2.17",
 	"manifest_version": 3,
+	"incognito": "split",
 	"icons": {
 		"16": "./images/icon_16.png",
 		"32": "./images/icon_32.png",
@@ -29,28 +30,26 @@
 		"type": "module",
 		"service_worker": "./build/background.js"
 	},
-	"content_scripts": [
-		{
-			"run_at": "document_idle",
-			"matches": [
-				"https://www.twitch.tv/*"
-			],
-			"exclude_matches": [
-				"https://www.twitch.tv/downloads/*",
-				"https://www.twitch.tv/jobs/*",
-				"https://www.twitch.tv/moderator/*",
-				"https://www.twitch.tv/p/*",
-				"https://www.twitch.tv/popout/*",
-				"https://www.twitch.tv/store/*",
-				"https://www.twitch.tv/team/*",
-				"https://www.twitch.tv/turbo/*"
-			],
-			"js": [
-				"./build/foreground.js"
-			],
-			"css": [
-				"./foreground/foreground.css"
-			]
-		}
-	]
+	"content_scripts": [{
+		"run_at": "document_idle",
+		"matches": [
+			"https://www.twitch.tv/*"
+		],
+		"exclude_matches": [
+			"https://www.twitch.tv/downloads/*",
+			"https://www.twitch.tv/jobs/*",
+			"https://www.twitch.tv/moderator/*",
+			"https://www.twitch.tv/p/*",
+			"https://www.twitch.tv/popout/*",
+			"https://www.twitch.tv/store/*",
+			"https://www.twitch.tv/team/*",
+			"https://www.twitch.tv/turbo/*"
+		],
+		"js": [
+			"./build/foreground.js"
+		],
+		"css": [
+			"./foreground/foreground.css"
+		]
+	}]
 }

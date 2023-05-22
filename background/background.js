@@ -20,15 +20,23 @@ function main() {
 		}
 	});
 
-	chrome.runtime.onMessage.addListener(async (msg, sender) => {
-		switch (msg.subject) {
-			case "ready":
-				chrome.tabs.sendMessage(sender.tab.id, {
-					subject: "navigation",
-					content: msg.content
+	chrome.runtime.onConnect.addListener((port) => {
+		switch (port.name) {
+			case "foreground": {
+				chrome.tabs.sendMessage(port.sender.tab.id, {
+					subject: "navigation"
 				}).catch((err) => null);
 				break;
-			case "favorites updated":
+			}
+			default: {
+				break;
+			}
+		}
+	});
+
+	chrome.runtime.onMessage.addListener(async (msg, sender) => {
+		switch (msg.subject) {
+			case "favorites updated": {
 				try {
 					const active_window = await chrome.windows.getLastFocused();
 					const ttv_tabs = await chrome.tabs.query({
@@ -46,8 +54,10 @@ function main() {
 					console.error(err);
 				}
 				break;
-			default:
+			}
+			default: {
 				break;
+			}
 		}
 	});
 
