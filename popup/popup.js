@@ -20,7 +20,7 @@ function refresh_favorites_list() {
 
 	for (const favorite of favorites) {
 		favorites_list.insertAdjacentHTML("beforeend", `
-			<li>${favorite}</li>
+			<li><a href="https://www.twitch.tv/${favorite}" target="_blank">${favorite}</a></li>
 		`);
 	}
 }
