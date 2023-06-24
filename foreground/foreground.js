@@ -165,7 +165,7 @@ function add_star_btn() {
 	const channel_name = document.querySelector("h1.tw-title").innerHTML;
 
 	const star_btn = create_element_from_html_string(`
-		<button id="star_btn" class="${"btn_" + theme}" type="button">${(favorites.has(channel_name) ? "★" : "☆")}</button>
+		<button id="star_btn" class="${theme}" type="button">${(favorites.has(channel_name) ? "★" : "☆")}</button>
 	`);
 
 	star_btn.addEventListener("mouseenter", (evt) => {

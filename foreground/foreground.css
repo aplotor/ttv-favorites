@@ -2,24 +2,6 @@
 	display: none;
 }
 
-.btn_dark {
-	background: #2f2f35;
-	color: #efeff1;
-}
-
-.btn_dark:hover {
-	background: #35353b;
-}
-
-.btn_light {
-	background: #ededef;
-	color: #0e0e10;
-}
-
-.btn_light:hover {
-	background: #e3e3e6;
-}
-
 .star_indicator {
 	margin: 0 -0.35em 0 0;
 }
@@ -32,4 +14,22 @@
 	padding: 0 0.44em;
 	border-radius: 0.175em;
 	z-index: 999;
+
+	&.dark {
+		background: #2f2f35;
+		color: #efeff1;
+	
+		&:hover {
+			background: #35353b;
+		}
+	}
+	
+	&.light {
+		background: #ededef;
+		color: #0e0e10;
+	
+		&:hover {
+			background: #e3e3e6;
+		}
+	}
 }
