@@ -1,4 +1,4 @@
-# [ttv-favorites](https://chrome.google.com/webstore/detail/ttv-favorites/ehbgkeiljpignaickbblnbfkhfeemmme)
+# ttv-favorites
 
 enables favorites on Twitch.tv
 
