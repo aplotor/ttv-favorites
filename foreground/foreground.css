@@ -3,21 +3,21 @@
 }
 
 .btn_dark {
-	background: #2a2a2d;
+	background: #2f2f35;
 	color: #efeff1;
 }
 
 .btn_dark:hover {
-	background: #363639;
+	background: #35353b;
 }
 
 .btn_light {
-	background: #f2f2f2;
+	background: #ededef;
 	color: #0e0e10;
 }
 
 .btn_light:hover {
-	background: #ebebeb;
+	background: #e3e3e6;
 }
 
 .star_indicator {
@@ -28,8 +28,8 @@
 	font-size: 2.375rem;
 	line-height: 1;
 	height: 1.265em;
-	margin: 0 0.2em 0 0;
-	padding: 0 0.445em;
+	margin: 0 -1.475em 0 0;
+	padding: 0 0.44em;
 	border-radius: 0.175em;
 	z-index: 999;
 }
