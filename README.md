@@ -10,7 +10,7 @@ enables favorites on Twitch.tv
 	- ![demo](./images/demo.gif)
 - installation::
 	1. download and unzip [`zip.zip`](https://github.com/jc9108/ttv-favorites/raw/main/zip.zip)
-	2. go to [chrome://extensions](chrome://extensions)
+	2. go to chrome://extensions
 	3. make sure "Developer mode" (top right) is enabled
 	4. "Load unpacked" ➔ select the unzipped folder
 - note::
