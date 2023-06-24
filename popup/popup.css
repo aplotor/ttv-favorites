@@ -19,24 +19,26 @@ label {
 	line-height: 1;
 }
 
-.center {
-	text-align: center;
+.d_none {
+	display: none;
 }
 
-.float_right {
-	float: right;
+.center {
+	text-align: center;
 }
 
 .spacing {
 	margin: 0.3em 0;
 }
 
-.clearfix::after {
-	content: "";
-	clear: both;
-	display: table;
-}
+.flex {
+	display: flex;
 
-.d_none {
-	display: none;
+	&.between {
+		justify-content: space-between;
+	}
+
+	&.end {
+		justify-content: end;
+	}
 }
