@@ -11,8 +11,8 @@ enables favorites on Twitch.tv
 - installation::
 	1. download and unzip [`zip.zip`](https://github.com/jc9108/ttv-favorites/raw/main/zip.zip)
 	2. go to chrome://extensions
-	3. make sure "Developer mode" (top right) is enabled
-	4. "Load unpacked" ➔ select the unzipped folder
+		1. make sure "Developer mode" is enabled
+		2. "Load unpacked" ➔ select the unzipped folder
 - note::
 	- the left sidebar on Twitch.tv must be expanded for this extension to work
 	- favorites are synced to your browser account, not your Twitch.tv account
