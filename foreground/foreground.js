@@ -211,13 +211,13 @@ function add_star_btn() {
 		const btns_section = document.querySelector('[data-target="channel-header-right"]');
 		if (btns_section.children.length > 0) {
 			btns_section_mo.disconnect();
-
-			if (btns_section.children.length > 2) {
-				const react_btn = btns_section.children[0];
-				react_btn.remove();
-			}
-
-			btns_section.prepend(star_btn);
+			setTimeout(() => {
+				if (btns_section.children.length > 2) {
+					const react_btn = btns_section.children[0];
+					react_btn.remove();
+				}
+				btns_section.prepend(star_btn);
+			}, 500);
 		}
 	});
 	btns_section_mo.observe(document.body, {
